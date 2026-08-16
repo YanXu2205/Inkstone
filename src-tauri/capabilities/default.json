@@ -1,0 +1,19 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Default capability for the main window: file dialogs and text file access for documents the user picks.",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "dialog:default",
+    "fs:default",
+    {
+      "identifier": "fs:allow-read-text-file",
+      "scope": { "paths": ["**"] }
+    },
+    {
+      "identifier": "fs:allow-write-text-file",
+      "scope": { "paths": ["**"] }
+    }
+  ]
+}

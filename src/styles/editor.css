@@ -1,0 +1,322 @@
+/* ===== Editor typography & WYSIWYG look ===== */
+
+#editor .cm-scroller {
+  font-family: var(--font-content);
+  line-height: 1.75;
+}
+
+#editor .cm-content {
+  max-width: 830px;
+  margin: 0 auto;
+  padding: 44px 32px 40vh;
+  caret-color: var(--accent);
+}
+
+#editor .cm-line {
+  padding: 0 2px;
+  font-size: 15.5px;
+}
+
+#editor .cm-cursor {
+  border-left-width: 2px;
+}
+
+#editor ::selection {
+  background: var(--sel);
+}
+
+#editor .cm-selectionBackground {
+  background: var(--sel) !important;
+}
+
+/* Placeholder shown on empty documents */
+#editor .cm-placeholder {
+  color: var(--fg-faint);
+}
+
+/* ---- headings ---- */
+
+.ot-h1,
+.ot-h2,
+.ot-h3,
+.ot-h4,
+.ot-h5,
+.ot-h6 {
+  font-weight: 650;
+  line-height: 1.35;
+  color: var(--fg);
+}
+
+.ot-h1 {
+  font-size: 1.8em;
+  padding: 0.35em 0 0.25em;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.15em;
+}
+
+.ot-h2 {
+  font-size: 1.42em;
+  padding: 0.55em 0 0.25em;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.1em;
+}
+
+.ot-h3 {
+  font-size: 1.22em;
+  padding-top: 0.5em;
+}
+
+.ot-h4 {
+  font-size: 1.08em;
+  padding-top: 0.45em;
+}
+
+.ot-h5 {
+  font-size: 1em;
+  padding-top: 0.4em;
+  color: var(--fg-dim);
+}
+
+.ot-h6 {
+  font-size: 0.94em;
+  padding-top: 0.4em;
+  color: var(--fg-dim);
+}
+
+/* ---- inline styles ---- */
+
+.ot-t-strong {
+  font-weight: 680;
+  color: var(--fg);
+}
+
+.ot-t-emphasis {
+  font-style: italic;
+}
+
+.ot-t-strike {
+  text-decoration: line-through;
+  text-decoration-color: var(--fg-faint);
+  color: var(--fg-dim);
+}
+
+.ot-t-link {
+  color: var(--accent);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.ot-t-link:hover {
+  text-decoration: underline;
+}
+
+.ot-t-url {
+  color: var(--fg-faint);
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+}
+
+/* syntax characters (#, *, `, > …) — visible only while editing nearby */
+.ot-t-mark {
+  color: var(--fg-faint);
+  opacity: 0.65;
+}
+
+.ot-t-quote {
+  color: var(--fg-dim);
+}
+
+/* ---- inline code ---- */
+
+.ot-t-code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--code-bg);
+  border-radius: 4px;
+  padding: 1.5px 5px;
+  color: var(--fg);
+}
+
+/* ---- blockquote ---- */
+
+.ot-quote-line {
+  background: color-mix(in srgb, var(--code-bg) 55%, transparent);
+  border-left: 3px solid var(--quote-bar);
+  color: var(--fg-dim);
+}
+
+/* ---- fenced code blocks ---- */
+
+.ot-code-line {
+  background: var(--code-bg);
+  font-family: var(--font-mono);
+  font-size: 0.885em;
+  padding-left: 14px !important;
+  padding-right: 14px !important;
+  tab-size: 4;
+}
+
+.ot-code-first {
+  border-radius: 8px 8px 0 0;
+  padding-top: 10px !important;
+  margin-top: 4px;
+}
+
+.ot-code-last {
+  border-radius: 0 0 8px 8px;
+  padding-bottom: 10px !important;
+  margin-bottom: 4px;
+}
+
+.ot-code-first.ot-code-last {
+  border-radius: 8px;
+  margin-bottom: 4px;
+}
+
+/* language chip on the first line of a fenced block */
+.ot-code-first[data-lang]::after {
+  content: attr(data-lang);
+  float: right;
+  font-size: 10.5px;
+  line-height: 1;
+  padding: 3px 7px;
+  margin-top: 2px;
+  border-radius: 999px;
+  color: var(--fg-faint);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  font-family: var(--font-ui);
+  text-transform: lowercase;
+  user-select: none;
+}
+
+/* code token colors (work inside code blocks too) */
+.ot-t-keyword {
+  color: #cf222e;
+}
+
+.ot-t-string {
+  color: #0a3069;
+}
+
+.ot-t-number {
+  color: #0550ae;
+}
+
+.ot-t-comment {
+  color: var(--fg-faint);
+  font-style: italic;
+}
+
+.ot-t-func {
+  color: #8250df;
+}
+
+.ot-t-var {
+  color: var(--fg);
+}
+
+.ot-t-typeName {
+  color: #953800;
+}
+
+html[data-theme="dark"] .ot-t-keyword {
+  color: #ff7b72;
+}
+
+html[data-theme="dark"] .ot-t-string {
+  color: #a5d6ff;
+}
+
+html[data-theme="dark"] .ot-t-number {
+  color: #79c0ff;
+}
+
+html[data-theme="dark"] .ot-t-func {
+  color: #d2a8ff;
+}
+
+html[data-theme="dark"] .ot-t-typeName {
+  color: #ffa657;
+}
+
+/* ---- tables ---- */
+
+.ot-t-table {
+  color: var(--fg);
+}
+
+/* ---- widgets ---- */
+
+.ot-img {
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: top;
+}
+
+.ot-img img {
+  display: block;
+  max-width: 100%;
+  border-radius: 6px;
+  margin: 6px 0;
+  box-shadow: var(--shadow);
+}
+
+.ot-img img.ot-img-broken {
+  padding: 6px 12px;
+  border: 1px dashed var(--border);
+  box-shadow: none;
+  font-size: 12px;
+  color: var(--fg-faint);
+  font-family: var(--font-ui);
+}
+
+.ot-task {
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border: 1.5px solid var(--fg-faint);
+  border-radius: 4px;
+  vertical-align: -2px;
+  margin-right: 4px;
+  cursor: pointer;
+  position: relative;
+  background: transparent;
+}
+
+.ot-task:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.ot-task:checked::after {
+  content: "";
+  position: absolute;
+  left: 4.2px;
+  top: 1.2px;
+  width: 4px;
+  height: 8px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(42deg);
+}
+
+/* task list item text gets dimmed+strikethrough via JS-added class */
+.ot-task-done {
+  color: var(--fg-faint);
+}
+
+/* horizontal rule rendered as a clean rule */
+.ot-hr {
+  display: inline-block;
+  width: 100%;
+  height: 0;
+  border-top: 1.5px solid var(--border);
+  margin: 10px 0;
+  vertical-align: middle;
+}
+
+/* footnotes etc. */
+.ot-t-meta {
+  color: var(--fg-faint);
+}

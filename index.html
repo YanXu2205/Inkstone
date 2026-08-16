@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="OpenTypora — a free, open-source, local-first WYSIWYG Markdown editor. The community successor to Typora & MarkText."
+    />
+    <title>OpenTypora</title>
+    <script>
+      // Apply saved theme before first paint to avoid flashing.
+      const t = localStorage.getItem("ot.theme") || "auto";
+      const dark =
+        t === "dark" ||
+        (t === "auto" && matchMedia("(prefers-color-scheme: dark)").matches);
+      document.documentElement.dataset.theme = dark ? "dark" : "light";
+    </script>
+  </head>
+  <body>
+    <div id="app">
+      <header id="topbar">
+        <div class="tb-left">
+          <button id="btn-sidebar" class="tb-btn" title="Toggle outline (Ctrl+\)">☰</button>
+          <span id="doc-title" class="doc-title">Untitled.md</span>
+          <span id="doc-dirty" class="doc-dirty" hidden>●</span>
+        </div>
+        <div class="tb-right">
+          <button id="btn-ai" class="tb-btn" title="AI settings">✨</button>
+          <button id="btn-export" class="tb-btn" title="Export / Print">⇩</button>
+          <button id="btn-theme" class="tb-btn" title="Toggle theme">◐</button>
+        </div>
+      </header>
+      <div id="main">
+        <aside id="sidebar">
+          <div class="sb-title">Outline</div>
+          <nav id="outline"></nav>
+        </aside>
+        <div id="editor-wrap">
+          <div id="editor"></div>
+        </div>
+      </div>
+      <footer id="statusbar">
+        <span id="st-pos">Ln 1, Col 1</span>
+        <span id="st-count">0 words · 0 chars</span>
+        <span class="st-spacer"></span>
+        <span id="st-mode">Markdown · Live Preview</span>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
