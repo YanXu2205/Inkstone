@@ -12,10 +12,12 @@ import { WELCOME_MD, MERMAID_DEMO_MD } from "./welcome";
 import { TabManager } from "./tabs";
 import { listRecents, saveRecent, removeRecent, type RecentEntry } from "./idb";
 import { refreshDecos } from "./editor/livePreview";
+import { Workspace } from "./workspace";
+import { applySettings, buildSettingsModal, loadSettings } from "./settings";
 
 /* ---------------- state ---------------- */
 
-const DRAFT_KEY = "ot.draft";
+const DRAFT_KEY = "ot.draft.v2";
 const THEME_KEY = "ot.theme";
 const TYPEWRITER_KEY = "ot.typewriter";
 
@@ -42,6 +44,7 @@ const dirtyEl = $("#doc-dirty");
 const sidebar = $("#sidebar");
 const outlineEl = $("#outline");
 const recentsEl = $("#recents");
+const filetreeEl = $("#filetree");
 const tabstrip = $("#tabstrip");
 const stPos = $("#st-pos");
 const stCount = $("#st-count");
@@ -150,6 +153,44 @@ $("#btn-ai").addEventListener("click", () => {
     }
   });
   document.body.appendChild(aiPanel.el);
+});
+
+/* ---------------- folder workspace ---------------- */
+
+let workspace: Workspace;
+
+function wireWorkspace() {
+  const btnOpen = $("#btn-ws-open") as HTMLButtonElement;
+  const btnNew = $("#btn-ws-new") as HTMLButtonElement;
+  const btnRefresh = $("#btn-ws-refresh") as HTMLButtonElement;
+
+  workspace = new Workspace(filetreeEl, recentsEl, view);
+  workspace.cb.onOpenFile = (name, text, handle) => {
+    tabman.openTab({ name, doc: text, handle });
+    localStorage.removeItem(DRAFT_KEY);
+    refreshAll();
+    view.focus();
+    void (async () => {
+      await saveRecent({ key: `fsa:${name}`, name, handle });
+      renderRecents(await listRecents());
+    })();
+  };
+
+  btnOpen.addEventListener("click", () => void workspace.connect());
+  btnNew.addEventListener("click", () => void workspace.newFile());
+  btnRefresh.addEventListener("click", () => void workspace.refresh());
+
+  void workspace.restore().then(() => {
+    const connected = !!workspace.root;
+    btnNew.hidden = !connected;
+    btnRefresh.hidden = !connected;
+  });
+}
+
+/* ---------------- settings ---------------- */
+
+$("#btn-settings").addEventListener("click", () => {
+  document.body.appendChild(buildSettingsModal(() => view.focus()));
 });
 
 /* ---------------- typewriter mode ---------------- */
@@ -304,7 +345,11 @@ function scheduleDraft() {
   clearTimeout(draftTimer);
   draftTimer = setTimeout(() => {
     const cur = tabman.active;
-    if (cur?.isWelcome) localStorage.setItem(DRAFT_KEY, view.state.doc.toString());
+    if (!cur?.isWelcome) return;
+    const text = view.state.doc.toString();
+    // An unedited welcome should never shadow future welcome updates.
+    if (text === WELCOME_MD) localStorage.removeItem(DRAFT_KEY);
+    else localStorage.setItem(DRAFT_KEY, text);
   }, 800);
 }
 
@@ -400,7 +445,9 @@ tabman.openTab({ name: "Welcome.md", doc: initialDoc, isWelcome: isFreshWelcome 
 tabman.onChanged = renderTabs;
 tabman.markDirty(false);
 renderTabs();
+wireWorkspace();
 
+applySettings(loadSettings());
 applyTheme();
 setTypewriter(typewriter);
 refreshAll();

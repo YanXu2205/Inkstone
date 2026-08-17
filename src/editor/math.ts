@@ -10,6 +10,7 @@ import type { InlineParser } from "@lezer/markdown";
 const DOLLAR = 36;
 const BACKSLASH = 92;
 const NEWLINE = 10;
+const EQUALS = 61;
 
 export const mathInlineParser: InlineParser = {
   name: "otMath",
@@ -42,7 +43,23 @@ export const mathInlineParser: InlineParser = {
   },
 };
 
-/** Extract the TeX body from a math node's source text. */
+/** `==highlight==` — atomic inline node, styled by the live preview. */
+export const highlightInlineParser: InlineParser = {
+  name: "otHighlight",
+  parse(cx, next, pos) {
+    if (next !== EQUALS || cx.char(pos + 1) !== EQUALS) return -1;
+    for (let i = pos + 2; i < cx.end; i++) {
+      const c = cx.char(i);
+      if (c === NEWLINE || c === -1) break;
+      if (c === EQUALS && cx.char(i + 1) === EQUALS && i > pos + 2) {
+        const end = i + 2;
+        cx.addElement(cx.elt("Highlight", pos, end));
+        return end;
+      }
+    }
+    return -1;
+  },
+};
 export function mathBody(text: string): { tex: string; display: boolean } {
   if (text.startsWith("$$") && text.endsWith("$$") && text.length >= 4) {
     return { tex: text.slice(2, -2).trim(), display: true };

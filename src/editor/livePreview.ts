@@ -8,7 +8,14 @@ import {
 import { StateEffect } from "@codemirror/state";
 import { syntaxTree } from "@codemirror/language";
 import { EditorSelection, EditorState, Range, StateField } from "@codemirror/state";import type { SyntaxNodeRef } from "@lezer/common";
-import { HrWidget, ImageWidget, MathWidget, MermaidWidget, TaskCheckboxWidget } from "./widgets";
+import {
+  FootnoteRefWidget,
+  HrWidget,
+  ImageWidget,
+  MathWidget,
+  MermaidWidget,
+  TaskCheckboxWidget,
+} from "./widgets";
 import { mathBody } from "./math";
 
 /**
@@ -176,6 +183,16 @@ function buildDecorations(view: EditorView): DecorationSet {
           }
           if (marks.length >= 2) {
             const [open, close] = marks;
+            const label = doc.sliceString(open.to, close.from);
+            // `[^label]` footnote reference → superscript chip widget
+            if (label.startsWith("^")) {
+              ranges.push(
+                Decoration.replace({
+                  widget: new FootnoteRefWidget(n.from, label.slice(1)),
+                }).range(n.from, n.to),
+              );
+              break;
+            }
             hide(open.from, open.to);
             ranges.push(
               Decoration.mark({ class: "ot-t-link" }).range(open.to, close.from),
@@ -286,6 +303,15 @@ function buildDecorations(view: EditorView): DecorationSet {
           break;
         }
 
+        case "Highlight": {
+          ranges.push(Decoration.mark({ class: "ot-hl" }).range(n.from, n.to));
+          if (!touched(sel, n.from, n.to)) {
+            hide(n.from, n.from + 2);
+            hide(n.to - 2, n.to);
+          }
+          break;
+        }
+
         case "HorizontalRule": {
           if (touched(sel, n.from, n.to)) break;
           ranges.push(
@@ -296,6 +322,18 @@ function buildDecorations(view: EditorView): DecorationSet {
       }
     },
   });
+
+  // Footnote definition lines (`[^label]: text`) — small & faint.
+  {
+    let inFence = false;
+    for (let i = 1; i <= doc.lines; i++) {
+      const line = doc.line(i);
+      if (/^\s*(```|~~~)/.test(line.text)) inFence = !inFence;
+      if (!inFence && /^\s*\[\^[^\]]+\]:/.test(line.text)) {
+        addLineClass(line.from, "ot-fn-def");
+      }
+    }
+  }
 
   return Decoration.set(ranges, true);
 }

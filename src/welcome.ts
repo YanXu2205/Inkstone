@@ -43,8 +43,10 @@ Try it: click into the line below, then click away.
 
 ## 🖋 Inline styles
 
-**Bold**, *italic*, ~~strikethrough~~, \`inline code\`, [a link](https://github.com),
-and emoji 🙂 — all render live.
+**Bold**, *italic*, ~~strikethrough~~, \`inline code\`, ==highlight==, [a link](https://github.com),
+and emoji 🙂 — all render live. Footnotes too[^1].
+
+[^1]: This is a footnote definition — click the little chip above to jump here.
 
 ## 🧮 Math, rendered live by KaTeX
 

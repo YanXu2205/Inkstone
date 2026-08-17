@@ -45,6 +45,9 @@ Typora is lovely but **paid and closed-source**. MarkText was the beloved free a
 - **🧜 Mermaid diagrams** — ` ```mermaid ` blocks render as flowcharts & graphs, re-theming with the app
 - **📋 Styled GFM tables** — real headers, column alignment from the delimiter row, and the raw `|---|` separator hidden until you edit
 - **🗂 Multi-tab workspace** — every tab keeps its own undo history, cursor & viewport; recent files reopen with one click (handles persisted in IndexedDB)
+- **📂 Folder workspace** — open a directory as a file tree in the sidebar, browse, create files and open them as tabs; persisted across sessions
+- **⚙ Editor preferences** — content font, size, column width, and a Typora-style **custom CSS** override for everything else
+- **🖍 `==highlight==`** and **[^footnotes]** — chips jump to their definition
 - **🖼 Inline images** — paste from clipboard, fully offline via data URLs
 - **✅ Interactive checkboxes** — click to toggle `- [ ]` / `- [x]`
 - **📦 Syntax-highlighted code blocks** with a clean language chip (100+ languages)
@@ -53,7 +56,7 @@ Typora is lovely but **paid and closed-source**. MarkText was the beloved free a
 - **💾 Real file handling** — open / save / save-as `.md`; in-place saving on Chrome, Edge & the desktop app
 - **📄 Export** — self-contained styled HTML, or Print → PDF
 - **📲 Installable PWA** — works fully offline; install it from the browser like a native app
-- **✨ AI assist (optional)** — polish, translate (EN ⇄ 中文), summarize — with *your own* OpenAI-compatible API key. Nothing leaves your machine except the text you choose.
+- **✨ AI assist (optional)** — polish, translate (EN ⇄ 中文), summarize — with *your own* OpenAI-compatible API key, **including one-click presets for local Ollama & LM Studio**. Nothing leaves your machine except the text you choose.
 - **⌨️ Typora-style shortcuts** — `Ctrl+B` / `Ctrl+I` / `Ctrl+E` / `Ctrl+K` toggle around words, `Enter` continues lists & quotes, `Ctrl+S` saves
 - **📦 Tiny core** — the whole editor is ~40 kB gzipped (excluding language packs & KaTeX), no Electron in sight when running in a browser
 
@@ -109,12 +112,14 @@ When your caret enters a construct, its decorations lift and the raw syntax show
 - [x] Styled GFM tables
 - [x] Mermaid diagrams
 - [x] Multi-tab workspace & recent files
+- [x] Folder workspace (file tree)
+- [x] `==highlight==` & footnotes
+- [x] Editor preferences + custom CSS
 - [x] Five built-in themes + typewriter mode
 - [x] PWA — installable & offline
-- [ ] File tree / folder workspace
-- [ ] Custom CSS themes & font settings
-- [ ] Footnotes, TOC generation, image file management
-- [ ] Local AI via WebLLM / Ollama
+- [ ] Full theme gallery / importable themes
+- [ ] TOC generation, image file management
+- [ ] Local AI via WebLLM (in-browser weights)
 - [ ] i18n UI
 
 ## Contributing

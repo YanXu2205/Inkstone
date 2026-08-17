@@ -19,7 +19,7 @@ import "katex/dist/katex.min.css";
 
 import { livePreview, mermaidBlocks, mermaidWatcher } from "./livePreview";
 import { otHighlight } from "./theme";
-import { mathInlineParser } from "./math";
+import { mathInlineParser, highlightInlineParser } from "./math";
 import {
   insertLink,
   toggleBold,
@@ -82,8 +82,9 @@ function baseExtensions(): Extension[] {
           defineNodes: [
             { name: "InlineMath", style: t.monospace },
             { name: "DisplayMath", style: t.monospace },
+            { name: "Highlight", style: t.special(t.string) },
           ],
-          parseInline: [mathInlineParser],
+          parseInline: [mathInlineParser, highlightInlineParser],
         }),
       } as unknown as typeof markdownLanguage,
       codeLanguages: languages,

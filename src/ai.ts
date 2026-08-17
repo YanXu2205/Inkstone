@@ -52,6 +52,12 @@ export interface AIPanel {
   close(): void;
 }
 
+const PRESETS: { label: string; baseUrl: string; model: string }[] = [
+  { label: "OpenAI", baseUrl: "https://api.openai.com/v1", model: "gpt-4o-mini" },
+  { label: "Ollama (local)", baseUrl: "http://localhost:11434/v1", model: "llama3.2" },
+  { label: "LM Studio (local)", baseUrl: "http://localhost:1234/v1", model: "local-model" },
+];
+
 /** Settings + quick-action modal. `onAction` runs an AI command on the editor. */
 export function buildAIPanel(onAction: (id: string) => void): AIPanel {
   const s = getAISettings();
@@ -68,6 +74,22 @@ export function buildAIPanel(onAction: (id: string) => void): AIPanel {
     <input data-k="apiKey" type="password" value="${escapeAttr(s.apiKey)}" spellcheck="false" placeholder="sk-…">
     <label>Model</label>
     <input data-k="model" value="${escapeAttr(s.model)}" spellcheck="false">`;
+
+  const presetRow = document.createElement("div");
+  presetRow.style.cssText = "display:flex;gap:6px;flex-wrap:wrap;margin-top:8px";
+  for (const p of PRESETS) {
+    const b = document.createElement("button");
+    b.className = "ot-btn";
+    b.style.fontSize = "11.5px";
+    b.style.padding = "4px 10px";
+    b.textContent = p.label;
+    b.addEventListener("click", () => {
+      (modal.querySelector('[data-k="baseUrl"]') as HTMLInputElement).value = p.baseUrl;
+      (modal.querySelector('[data-k="model"]') as HTMLInputElement).value = p.model;
+    });
+    presetRow.appendChild(b);
+  }
+  modal.appendChild(presetRow);
 
   const actionsRow = document.createElement("div");
   actionsRow.style.cssText =

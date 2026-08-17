@@ -103,6 +103,49 @@ export class HrWidget extends WidgetType {
   }
 }
 
+/** Footnote reference `[^label]` — superscript chip, click jumps to definition. */
+export class FootnoteRefWidget extends WidgetType {
+  constructor(readonly pos: number, readonly label: string) {
+    super();
+  }
+
+  eq(other: FootnoteRefWidget) {
+    return other.pos === this.pos && other.label === this.label;
+  }
+
+  toDOM(view: EditorView) {
+    const sup = document.createElement("sup");
+    sup.className = "ot-fnref";
+    sup.textContent = this.label;
+    sup.title = `Footnote ^${this.label} — click to jump to definition`;
+    sup.addEventListener("mousedown", (e) => {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      const re = new RegExp(`^\\[\\^${escapeRe(this.label)}\\]:`, "m");
+      const doc = view.state.doc.toString();
+      const m = re.exec(doc);
+      if (!m) {
+        sup.title = "Definition not found";
+        return;
+      }
+      const target = m.index;
+      view.dispatch({
+        selection: { anchor: target },
+        effects: EditorView.scrollIntoView(target, { y: "center" }),
+      });
+    });
+    return sup;
+  }
+
+  ignoreEvent() {
+    return false;
+  }
+}
+
+function escapeRe(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 /** Mermaid diagram replacing a ```mermaid fenced block. */
 export class MermaidWidget extends WidgetType {
   private static seq = 0;

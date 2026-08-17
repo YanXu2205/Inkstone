@@ -6,6 +6,7 @@
 
 const DB_NAME = "opentypora";
 const STORE = "recents";
+const KV = "kv";
 
 export interface RecentEntry {
   key: string;
@@ -17,8 +18,12 @@ export interface RecentEntry {
 
 function open(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 1);
-    req.onupgradeneeded = () => req.result.createObjectStore(STORE, { keyPath: "key" });
+    const req = indexedDB.open(DB_NAME, 2);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, { keyPath: "key" });
+      if (!db.objectStoreNames.contains(KV)) db.createObjectStore(KV);
+    };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
   });
@@ -56,5 +61,35 @@ export async function removeRecent(key: string): Promise<void> {
     await tx("readwrite", (s) => s.delete(key));
   } catch {
     /* ignore */
+  }
+}
+
+/* ---- tiny kv store (workspace handle etc.) ---- */
+
+export async function kvGet<T>(key: string): Promise<T | undefined> {
+  try {
+    const db = await open();
+    return await new Promise<T | undefined>((resolve, reject) => {
+      const t = db.transaction(KV, "readonly");
+      const req = t.objectStore(KV).get(key);
+      req.onsuccess = () => resolve(req.result as T | undefined);
+      req.onerror = () => reject(req.error);
+    });
+  } catch {
+    return undefined;
+  }
+}
+
+export async function kvSet<T>(key: string, value: T): Promise<void> {
+  try {
+    const db = await open();
+    await new Promise<void>((resolve, reject) => {
+      const t = db.transaction(KV, "readwrite");
+      const req = t.objectStore(KV).put(value, key);
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+  } catch (e) {
+    console.warn("kvSet failed:", e);
   }
 }

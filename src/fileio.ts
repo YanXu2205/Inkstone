@@ -17,6 +17,7 @@ declare global {
   interface Window {
     showOpenFilePicker?: (opts?: object) => Promise<FileSystemFileHandle[]>;
     showSaveFilePicker?: (opts?: object) => Promise<FileSystemFileHandle>;
+    showDirectoryPicker?: (opts?: object) => Promise<FileSystemDirectoryHandle>;
     __TAURI__?: {
       dialog?: {
         open: (opts?: object) => Promise<string | string[] | null>;
@@ -40,9 +41,77 @@ const MD_FILTERS = [
   },
 ];
 
+export interface DirEntry {
+  name: string;
+  dir: boolean;
+  handle: FileSystemFileHandle | FileSystemDirectoryHandle;
+}
+
 export const hasFSA = () =>
   typeof window.showOpenFilePicker === "function" &&
-  typeof window.showSaveFilePicker === "function";
+  typeof window.showSaveFilePicker === "function" &&
+  typeof window.showDirectoryPicker === "function";
+
+/** Pick a folder to use as the workspace (Chrome/Edge). */
+export async function pickDirectory(): Promise<FileSystemDirectoryHandle | null> {
+  if (typeof window.showDirectoryPicker !== "function") return null;
+  try {
+    return await window.showDirectoryPicker({ mode: "readwrite" });
+  } catch (e) {
+    if ((e as DOMException)?.name === "AbortError") return null;
+    console.error(e);
+    return null;
+  }
+}
+
+/** Read a directory's direct children, folders first. */
+export async function readDir(dir: FileSystemDirectoryHandle): Promise<DirEntry[]> {
+  const entries: DirEntry[] = [];
+  const it = (dir as unknown as {
+    values(): AsyncIterableIterator<FileSystemFileHandle | FileSystemDirectoryHandle>;
+  }).values();
+  for await (const handle of it) {
+    const dirEntry = handle.kind === "directory";
+    if (dirEntry || /\.(md|markdown|txt)$/i.test(handle.name)) {
+      entries.push({ name: handle.name, dir: dirEntry, handle });
+    }
+  }
+  return entries.sort((a, b) =>
+    a.dir === b.dir ? a.name.localeCompare(b.name) : a.dir ? -1 : 1,
+  );
+}
+
+export async function readTextFromHandle(
+  handle: FileSystemFileHandle,
+): Promise<string> {
+  const file = await handle.getFile();
+  return file.text();
+}
+
+export async function writeTextToHandle(
+  handle: FileSystemFileHandle,
+  text: string,
+): Promise<void> {
+  const w = await handle.createWritable();
+  await w.write(text);
+  await w.close();
+}
+
+export async function createFileInDir(
+  dir: FileSystemDirectoryHandle,
+  name: string,
+): Promise<FileSystemFileHandle | null> {
+  try {
+    const handle = await dir.getFileHandle(name, { create: true });
+    const w = await handle.createWritable();
+    await w.write("");
+    await w.close();
+    return handle;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+}
 
 export const isTauri = () => typeof window.__TAURI__ !== "undefined";
 

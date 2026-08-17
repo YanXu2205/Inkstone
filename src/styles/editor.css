@@ -6,7 +6,7 @@
 }
 
 #editor .cm-content {
-  max-width: 830px;
+  max-width: var(--content-width, 830px);
   margin: 0 auto;
   padding: 44px 32px 40vh;
   caret-color: var(--accent);
@@ -14,7 +14,7 @@
 
 #editor .cm-line {
   padding: 0 2px;
-  font-size: 15.5px;
+  font-size: var(--content-size, 15.5px);
 }
 
 #editor .cm-cursor {
@@ -349,6 +349,39 @@ html[data-theme="dark"] .ot-t-typeName {
   border-radius: 4px;
   padding: 1px 6px;
   color: var(--fg-dim);
+}
+
+/* ---- highlight & footnotes ---- */
+
+.ot-hl {
+  background: color-mix(in srgb, #ffd54f 45%, transparent);
+  border-radius: 3px;
+  padding: 1px 0;
+}
+
+html[data-tone="dark"] .ot-hl {
+  background: color-mix(in srgb, #b58900 45%, transparent);
+}
+
+.ot-fnref {
+  color: var(--accent);
+  font-size: 0.72em;
+  cursor: pointer;
+  border: 1px solid var(--accent-soft);
+  background: var(--accent-soft);
+  border-radius: 6px;
+  padding: 1px 6px;
+  user-select: none;
+}
+
+.ot-fnref:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.ot-fn-def {
+  color: var(--fg-faint);
+  font-size: 0.88em;
 }
 
 /* ---- mermaid diagrams ---- */
