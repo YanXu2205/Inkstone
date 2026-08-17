@@ -30,6 +30,8 @@ flowchart TD
 
 export const WELCOME_MD = `# Welcome to OpenTypora 👋
 
+[toc]
+
 A **free, open-source, local-first** Markdown editor with a seamless live preview —
 the community successor to Typora & MarkText.
 

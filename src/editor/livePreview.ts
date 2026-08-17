@@ -15,8 +15,10 @@ import {
   MathWidget,
   MermaidWidget,
   TaskCheckboxWidget,
+  TocWidget,
 } from "./widgets";
 import { mathBody } from "./math";
+import { extractHeadings } from "../outline";
 
 /**
  * The heart of OpenTypora: a Typora-style "seamless live preview".
@@ -342,17 +344,18 @@ function buildDecorations(view: EditorView): DecorationSet {
 export const refreshDecos = StateEffect.define<void>();
 
 /**
- * ```mermaid blocks → rendered diagrams.
+ * Block-level widgets — Mermaid diagrams and `[toc]` tables of
+ * contents.
  *
  * Block replace decorations may not be provided by view plugins, so
- * this lives in a StateField. Because the syntax tree parses
+ * they live in a StateField. Because the syntax tree parses
  * asynchronously, a small watcher plugin signals the field (via a
  * microtask dispatch — plugins may not dispatch inside update) every
  * time the tree, doc, selection or theme changes.
  */
-const recomputeMermaid = StateEffect.define<void>();
+const recomputeBlocks = StateEffect.define<void>();
 
-export const mermaidWatcher = ViewPlugin.fromClass(
+export const blockWatcher = ViewPlugin.fromClass(
   class {
     update(u: ViewUpdate) {
       if (
@@ -363,27 +366,29 @@ export const mermaidWatcher = ViewPlugin.fromClass(
         u.transactions.some((tr) => tr.effects.some((e) => e.is(refreshDecos)))
       ) {
         const view = u.view;
-        queueMicrotask(() => view.dispatch({ effects: recomputeMermaid.of() }));
+        queueMicrotask(() => view.dispatch({ effects: recomputeBlocks.of() }));
       }
     }
   },
 );
 
-export const mermaidBlocks = StateField.define<DecorationSet>({
+export const blockWidgets = StateField.define<DecorationSet>({
   create(state) {
-    return safeBuildMermaid(state);
+    return safeBuildBlocks(state);
   },
   update(value, tr) {
-    for (const e of tr.effects) if (e.is(recomputeMermaid)) return safeBuildMermaid(tr.state);
+    for (const e of tr.effects) if (e.is(recomputeBlocks)) return safeBuildBlocks(tr.state);
     return value;
   },
   provide: (field) => EditorView.decorations.from(field),
 });
 
-function safeBuildMermaid(state: EditorState): DecorationSet {
+function safeBuildBlocks(state: EditorState): DecorationSet {
   try {
     const ranges: Range<Decoration>[] = [];
     const doc = state.doc;
+    const sel = state.selection;
+
     syntaxTree(state).iterate({
       enter: (ref) => {
         if (ref.name !== "FencedCode") return;
@@ -406,9 +411,24 @@ function safeBuildMermaid(state: EditorState): DecorationSet {
         );
       },
     });
+
+    // `[toc]` lines → auto table of contents
+    for (let i = 1; i <= doc.lines; i++) {
+      const line = doc.line(i);
+      if (!/^\s*\[toc\]\s*$/i.test(line.text)) continue;
+      if (touched(sel, line.from, line.to)) continue;
+      const headings = extractHeadings(doc.toString());
+      ranges.push(
+        Decoration.replace({
+          widget: new TocWidget(line.from, headings),
+          block: true,
+        }).range(line.from, line.to),
+      );
+    }
+
     return Decoration.set(ranges, true);
   } catch (e) {
-    console.error("[mermaidBlocks] build failed:", e);
+    console.error("[blockWidgets] build failed:", e);
     return Decoration.none;
   }
 }

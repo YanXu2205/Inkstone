@@ -20,7 +20,10 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "check": "tsc --noEmit",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "npm run test:latex && npm run test:epub",
+    "test:latex": "esbuild scripts/test-latex.mts --bundle --format=esm --platform=node --outfile=node_modules/.test-latex.mjs --log-level=error && node node_modules/.test-latex.mjs",
+    "test:epub": "esbuild scripts/test-epub.mts --bundle --format=esm --platform=node --outfile=node_modules/.test-epub.mjs --log-level=error && node node_modules/.test-epub.mjs"
   },
   "dependencies": {
     "@codemirror/commands": "^6.11.0",
@@ -32,6 +35,7 @@
     "@codemirror/view": "^6.43.0",
     "@lezer/highlight": "^1.2.0",
     "@lezer/markdown": "^1.7.0",
+    "jszip": "^3.10.1",
     "katex": "^0.18.4",
     "markdown-it": "^14.1.0",
     "mermaid": "^11.16.1"

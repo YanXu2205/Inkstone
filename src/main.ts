@@ -6,7 +6,9 @@ import { EditorView } from "@codemirror/view";
 import { createEditor } from "./editor/editor";
 import { extractHeadings, renderOutline } from "./outline";
 import { openMarkdown, saveMarkdown, readDroppedFile, isTauri } from "./fileio";
-import { exportHTML, printPDF } from "./export";
+import { exportHTML, printPDF, mdInstance } from "./export";
+import { exportWord, exportLatex, exportEpub } from "./export-extra";
+import { saveImageToWorkspace, setAssetBase } from "./assets";
 import { buildAIPanel, runAI, toast, type AIPanel } from "./ai";
 import { WELCOME_MD, MERMAID_DEMO_MD } from "./welcome";
 import { TabManager } from "./tabs";
@@ -124,9 +126,14 @@ $("#btn-theme").addEventListener("click", (e) => {
 
 $("#btn-export").addEventListener("click", (e) => {
   e.stopPropagation();
+  const title = docTitle();
+  const src = () => view.state.doc.toString();
   showMenu(e.currentTarget as HTMLElement, [
-    ["📄 Export HTML", () => exportHTML(docTitle(), view.state.doc.toString())],
-    ["🖨 Print / PDF", () => printPDF(docTitle(), view.state.doc.toString())],
+    ["📄 Export HTML", () => exportHTML(title, src())],
+    ["📝 Export Word (.doc)", () => exportWord(title, src())],
+    ["🧪 Export LaTeX (.tex)", () => exportLatex(mdInstance, title, src())],
+    ["📚 Export ePub (.epub)", () => void exportEpub(title, src())],
+    ["🖨 Print / PDF", () => printPDF(title, src())],
   ]);
 });
 
@@ -176,15 +183,41 @@ function wireWorkspace() {
     })();
   };
 
-  btnOpen.addEventListener("click", () => void workspace.connect());
+  btnOpen.addEventListener("click", () =>
+    void workspace.connect().then(() => setAssetBase(workspace.root)),
+  );
   btnNew.addEventListener("click", () => void workspace.newFile());
   btnRefresh.addEventListener("click", () => void workspace.refresh());
+  setAssetBase(workspace.root);
 
   void workspace.restore().then(() => {
     const connected = !!workspace.root;
     btnNew.hidden = !connected;
     btnRefresh.hidden = !connected;
+    setAssetBase(workspace.root);
   });
+}
+
+/* ---------------- image paste/drop ---------------- */
+
+async function pasteImage(file: File) {
+  const name = (file.name || "image").replace(/\.[A-Za-z0-9]+$/, "");
+  const rel = await saveImageToWorkspace(file);
+  if (rel) {
+    view.dispatch(view.state.replaceSelection(`![${name}](${rel})`), {
+      scrollIntoView: true,
+    });
+    toast(`Image saved to ${rel}`);
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    view.dispatch(
+      view.state.replaceSelection(`![${name}](${reader.result})`),
+      { scrollIntoView: true },
+    );
+  };
+  reader.readAsDataURL(file);
 }
 
 /* ---------------- settings ---------------- */
@@ -438,6 +471,7 @@ view = createEditor($("#editor"), initialDoc, {
     }
   },
   onOpenDroppedFile: openDropped,
+  onPasteImage: (file) => void pasteImage(file),
 });
 
 tabman = new TabManager(view);

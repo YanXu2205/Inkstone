@@ -1,5 +1,6 @@
 import { EditorView, WidgetType } from "@codemirror/view";
 import katex from "katex";
+import { resolveImageSrc } from "../assets";
 
 /**
  * Inline image — replaces the raw `![alt](src)` syntax with the actual
@@ -30,6 +31,13 @@ export class ImageWidget extends WidgetType {
       wrap.classList.add("ot-img-broken");
     });
     img.src = this.src;
+    // Relative paths inside a folder workspace resolve via the
+    // directory handle into a blob URL.
+    if (this.src && !/^(data|https?|blob):/i.test(this.src)) {
+      void resolveImageSrc(this.src).then((url) => {
+        if (url) img.src = url;
+      });
+    }
     wrap.appendChild(img);
     // Clicking an image puts the caret inside it, revealing raw markdown.
     wrap.addEventListener("mousedown", (e) => {
@@ -100,6 +108,60 @@ export class HrWidget extends WidgetType {
 
   ignoreEvent() {
     return true;
+  }
+}
+
+/** Auto table of contents replacing a `[toc]` line. */
+export class TocWidget extends WidgetType {
+  constructor(
+    readonly pos: number,
+    readonly headings: { level: number; text: string; pos: number }[],
+  ) {
+    super();
+  }
+
+  eq(other: TocWidget) {
+    return (
+      other.pos === this.pos &&
+      other.headings.length === this.headings.length &&
+      other.headings.every((h, i) => h.pos === this.headings[i].pos)
+    );
+  }
+
+  toDOM(view: EditorView) {
+    const wrap = document.createElement("div");
+    wrap.className = "ot-toc";
+    const title = document.createElement("div");
+    title.className = "ot-toc-title";
+    title.textContent = "Table of Contents";
+    wrap.appendChild(title);
+    for (const h of this.headings) {
+      const item = document.createElement("div");
+      item.className = "ot-toc-item";
+      item.style.paddingLeft = `${(h.level - 1) * 18}px`;
+      item.textContent = h.text;
+      item.addEventListener("mousedown", (e) => {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        view.dispatch({
+          selection: { anchor: h.pos },
+          effects: EditorView.scrollIntoView(h.pos, { y: "center" }),
+        });
+      });
+      wrap.appendChild(item);
+    }
+    if (!this.headings.length) {
+      const empty = document.createElement("div");
+      empty.className = "ot-toc-item";
+      empty.style.opacity = "0.6";
+      empty.textContent = "(no headings yet)";
+      wrap.appendChild(empty);
+    }
+    return wrap;
+  }
+
+  ignoreEvent() {
+    return false;
   }
 }
 

@@ -351,6 +351,43 @@ html[data-theme="dark"] .ot-t-typeName {
   color: var(--fg-dim);
 }
 
+/* ---- auto table of contents ([toc]) ---- */
+
+.ot-toc {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-side);
+  padding: 14px 18px;
+  margin: 14px 0;
+  max-width: 560px;
+  user-select: none;
+}
+
+.ot-toc-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--fg-faint);
+  margin-bottom: 8px;
+}
+
+.ot-toc-item {
+  font-size: 0.95em;
+  line-height: 1.9;
+  color: var(--fg-dim);
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-radius: 4px;
+}
+
+.ot-toc-item:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
 /* ---- highlight & footnotes ---- */
 
 .ot-hl {

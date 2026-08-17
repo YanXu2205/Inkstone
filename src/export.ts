@@ -66,6 +66,9 @@ export function renderMarkdown(src: string): string {
   return md.render(src);
 }
 
+/** shared instance for advanced exporters (LaTeX walks the token stream). */
+export const mdInstance = md;
+
 const EXPORT_CSS = String.raw`
 :root { color-scheme: light dark; }
 * { box-sizing: border-box; }

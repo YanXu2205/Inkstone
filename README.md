@@ -48,13 +48,14 @@ Typora is lovely but **paid and closed-source**. MarkText was the beloved free a
 - **📂 Folder workspace** — open a directory as a file tree in the sidebar, browse, create files and open them as tabs; persisted across sessions
 - **⚙ Editor preferences** — content font, size, column width, and a Typora-style **custom CSS** override for everything else
 - **🖍 `==highlight==`** and **[^footnotes]** — chips jump to their definition
-- **🖼 Inline images** — paste from clipboard, fully offline via data URLs
+- **🖼 Inline images** — paste from clipboard; inside a folder workspace they are saved to `assets/` and referenced by relative path (Typora-style), otherwise embedded offline as data URLs
+- **📑 Auto table of contents** — write `[toc]` on a line and get a live, clickable contents box that follows your headings
 - **✅ Interactive checkboxes** — click to toggle `- [ ]` / `- [x]`
 - **📦 Syntax-highlighted code blocks** with a clean language chip (100+ languages)
 - **🌓 Five themes** — Light, Dark, Solarized, Nord & Dracula, plus auto (system)
 - **⌨️ Typewriter mode** & document outline with click-to-jump (`Ctrl+\`)
 - **💾 Real file handling** — open / save / save-as `.md`; in-place saving on Chrome, Edge & the desktop app
-- **📄 Export** — self-contained styled HTML, or Print → PDF
+- **📄 Export** — self-contained HTML, **Word (.doc)**, **LaTeX (.tex)**, **ePub 3 (.epub)** with a navigable table of contents, or Print → PDF — all offline
 - **📲 Installable PWA** — works fully offline; install it from the browser like a native app
 - **✨ AI assist (optional)** — polish, translate (EN ⇄ 中文), summarize — with *your own* OpenAI-compatible API key, **including one-click presets for local Ollama & LM Studio**. Nothing leaves your machine except the text you choose.
 - **⌨️ Typora-style shortcuts** — `Ctrl+B` / `Ctrl+I` / `Ctrl+E` / `Ctrl+K` toggle around words, `Enter` continues lists & quotes, `Ctrl+S` saves
@@ -114,11 +115,14 @@ When your caret enters a construct, its decorations lift and the raw syntax show
 - [x] Multi-tab workspace & recent files
 - [x] Folder workspace (file tree)
 - [x] `==highlight==` & footnotes
-- [x] Editor preferences + custom CSS
 - [x] Five built-in themes + typewriter mode
+- [x] Editor preferences + custom CSS
 - [x] PWA — installable & offline
+- [x] Image assets saved to workspace `assets/` with relative paths
+- [x] `[toc]` auto table of contents
+- [x] Export to Word / LaTeX / ePub
+- [x] Offline unit tests (`npm test`)
 - [ ] Full theme gallery / importable themes
-- [ ] TOC generation, image file management
 - [ ] Local AI via WebLLM (in-browser weights)
 - [ ] i18n UI
 

@@ -17,7 +17,7 @@ import { tags as t } from "@lezer/highlight";
 import type { MarkdownParser } from "@lezer/markdown";
 import "katex/dist/katex.min.css";
 
-import { livePreview, mermaidBlocks, mermaidWatcher } from "./livePreview";
+import { livePreview, blockWidgets, blockWatcher } from "./livePreview";
 import { otHighlight } from "./theme";
 import { mathInlineParser, highlightInlineParser } from "./math";
 import {
@@ -41,6 +41,8 @@ export interface EditorCallbacks {
   onSelectionChanged?(view: EditorView): void;
   /** User dropped a .md file onto the editor. */
   onOpenDroppedFile?(file: File): void;
+  /** Pasted or dropped an image; the app decides data-URL vs workspace file. */
+  onPasteImage?(file: File): void;
 }
 
 export function createEditor(
@@ -91,15 +93,15 @@ function baseExtensions(): Extension[] {
     }),
     syntaxHighlighting(otHighlight),
     livePreview,
-    mermaidBlocks,
-    mermaidWatcher,
+    blockWidgets,
+    blockWatcher,
   ];
 }
 
-/** Paste images & drop .md files. */
+/** Paste images & drop files. */
 function interactiveHandlers(cb: EditorCallbacks): Extension {
   return EditorView.domEventHandlers({
-    paste(event, view) {
+    paste(event) {
       const items = event.clipboardData?.items;
       if (!items) return false;
       for (const item of items) {
@@ -107,14 +109,7 @@ function interactiveHandlers(cb: EditorCallbacks): Extension {
           const file = item.getAsFile();
           if (!file) continue;
           event.preventDefault();
-          const reader = new FileReader();
-          reader.onload = () => {
-            const name = file.name || "pasted-image.png";
-            view.dispatch(view.state.replaceSelection(`![${name}](${reader.result})`), {
-              scrollIntoView: true,
-            });
-          };
-          reader.readAsDataURL(file);
+          cb.onPasteImage?.(file);
           return true;
         }
       }
@@ -122,9 +117,14 @@ function interactiveHandlers(cb: EditorCallbacks): Extension {
     },
     drop(event) {
       const file = event.dataTransfer?.files?.[0];
-      if (file && /\.(md|markdown|txt)$/i.test(file.name)) {
-        event.preventDefault();
+      if (!file) return false;
+      event.preventDefault();
+      if (/\.(md|markdown|txt)$/i.test(file.name)) {
         cb.onOpenDroppedFile?.(file);
+        return true;
+      }
+      if (file.type.startsWith("image/")) {
+        cb.onPasteImage?.(file);
         return true;
       }
       return false;
