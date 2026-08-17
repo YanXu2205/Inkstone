@@ -8,6 +8,7 @@ import {
 } from "./fileio";
 import { kvGet, kvSet } from "./idb";
 import { toast } from "./ai";
+import { t } from "./i18n";
 
 /**
  * Folder workspace: a persisted directory handle rendered as a lazy
@@ -61,7 +62,7 @@ export class Workspace {
     this.openDirs.clear();
     await kvSet(WS_KEY, dir);
     this.render();
-    toast(`Workspace: ${dir.name}`);
+    toast(t("toast.wsConnected", dir.name));
   }
 
   async reconnect(saved: FileSystemDirectoryHandle): Promise<void> {
@@ -71,7 +72,7 @@ export class Workspace {
       this.root = saved;
       this.render();
     } else {
-      toast("Permission denied");
+      toast(t("toast.permissionDenied"));
     }
   }
 
@@ -81,12 +82,12 @@ export class Workspace {
 
   async newFile(): Promise<void> {
     if (!this.root) return;
-    const name = prompt("New file name", "untitled.md");
+    const name = prompt(t("ws.newFileName"), "untitled.md");
     if (!name) return;
     const finalName = /\.(md|markdown|txt)$/i.test(name) ? name : `${name}.md`;
     const handle = await createFileInDir(this.root, finalName);
     if (!handle) {
-      toast("Could not create file");
+      toast(t("toast.createFailed"));
       return;
     }
     this.cb.onOpenFile(finalName, "", handle);
@@ -97,7 +98,7 @@ export class Workspace {
     this.container.textContent = "";
     const btn = document.createElement("button");
     btn.className = "ot-outline-item";
-    btn.textContent = `🔓 Reconnect ${saved.name}`;
+    btn.textContent = t("sidebar.reconnect", saved.name);
     btn.onclick = () => this.reconnect(saved);
     this.container.appendChild(btn);
     this.emptyHint.hidden = true;
@@ -168,7 +169,7 @@ export class Workspace {
             this.markActive(e.name);
           } catch (err) {
             console.error(err);
-            toast(`Could not open ${e.name}`);
+            toast(t("toast.openFailed", e.name));
           }
         };
         parent.appendChild(el);

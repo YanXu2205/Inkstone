@@ -54,6 +54,7 @@ Typora 很优秀，但**收费且闭源**；MarkText 是最受欢迎的免费替
 - **📄 导出** —— 自包含 HTML、**Word (.doc)**、**LaTeX (.tex)**、**ePub 3 电子书**（含可导航目录）、打印为 PDF，全部离线完成
 - **📲 可安装 PWA** —— 完全离线可用，像原生应用一样从浏览器安装
 - **✨ AI 助手（可选）** —— 润色、中英互译、总结，使用*你自己的* OpenAI 兼容 API Key，**内置本地 Ollama / LM Studio 一键预设**。除你选中的文字外无任何数据离开你的机器
+- **🌍 界面多语言** —— English / 简体中文 / 日本語，自动检测、可切换；新增语言只需加一个对象
 - **⌨️ Typora 风格快捷键** —— `Ctrl+B` / `Ctrl+I` / `Ctrl+E` / `Ctrl+K` 对当前词智能包裹，`Enter` 自动延续列表与引用，`Ctrl+S` 保存
 - **📦 极小核心** —— 编辑器核心 gzip 后约 40 kB（不含语言包与 KaTeX），浏览器中运行无需 Electron
 
@@ -102,7 +103,7 @@ Windows / macOS / Linux 预编译包由 CI 发布在 [Releases](../../releases)�
 - [x] 离线单元测试（npm test）
 - [ ] 完整主题库 / 可导入主题
 - [ ] 浏览器内本地 AI（WebLLM）
-- [ ] 界面国际化
+- [x] 界面国际化（English / 简体中文 / 日本語）
 
 ## 参与贡献
 

@@ -58,6 +58,7 @@ Typora is lovely but **paid and closed-source**. MarkText was the beloved free a
 - **📄 Export** — self-contained HTML, **Word (.doc)**, **LaTeX (.tex)**, **ePub 3 (.epub)** with a navigable table of contents, or Print → PDF — all offline
 - **📲 Installable PWA** — works fully offline; install it from the browser like a native app
 - **✨ AI assist (optional)** — polish, translate (EN ⇄ 中文), summarize — with *your own* OpenAI-compatible API key, **including one-click presets for local Ollama & LM Studio**. Nothing leaves your machine except the text you choose.
+- **🌍 i18n** — UI in English, 简体中文 & 日本語 (auto-detected, switchable; adding a language is one object)
 - **⌨️ Typora-style shortcuts** — `Ctrl+B` / `Ctrl+I` / `Ctrl+E` / `Ctrl+K` toggle around words, `Enter` continues lists & quotes, `Ctrl+S` saves
 - **📦 Tiny core** — the whole editor is ~40 kB gzipped (excluding language packs & KaTeX), no Electron in sight when running in a browser
 
@@ -124,7 +125,7 @@ When your caret enters a construct, its decorations lift and the raw syntax show
 - [x] Offline unit tests (`npm test`)
 - [ ] Full theme gallery / importable themes
 - [ ] Local AI via WebLLM (in-browser weights)
-- [ ] i18n UI
+- [x] i18n UI (en / zh-CN / ja)
 
 ## Contributing
 

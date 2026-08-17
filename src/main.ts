@@ -16,6 +16,9 @@ import { listRecents, saveRecent, removeRecent, type RecentEntry } from "./idb";
 import { refreshDecos } from "./editor/livePreview";
 import { Workspace } from "./workspace";
 import { applySettings, buildSettingsModal, loadSettings } from "./settings";
+import { initLang, t } from "./i18n";
+
+initLang();
 
 /* ---------------- state ---------------- */
 
@@ -23,13 +26,13 @@ const DRAFT_KEY = "ot.draft.v2";
 const THEME_KEY = "ot.theme";
 const TYPEWRITER_KEY = "ot.typewriter";
 
-const THEMES: { id: string; label: string; tone: "light" | "dark" }[] = [
-  { id: "auto", label: "Auto (system)", tone: matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light" },
-  { id: "light", label: "Light", tone: "light" },
-  { id: "dark", label: "Dark", tone: "dark" },
-  { id: "solarized", label: "Solarized", tone: "light" },
-  { id: "nord", label: "Nord", tone: "dark" },
-  { id: "dracula", label: "Dracula", tone: "dark" },
+const THEMES: { id: string; tone: "light" | "dark" }[] = [
+  { id: "auto", tone: matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light" },
+  { id: "light", tone: "light" },
+  { id: "dark", tone: "dark" },
+  { id: "solarized", tone: "light" },
+  { id: "nord", tone: "dark" },
+  { id: "dracula", tone: "dark" },
 ];
 
 let view: EditorView;
@@ -59,14 +62,14 @@ let themeId = localStorage.getItem(THEME_KEY) || "auto";
 // ?theme=<id> — deep-linkable theme override (also used for testing)
 {
   const urlTheme = new URLSearchParams(location.search).get("theme");
-  if (urlTheme && THEMES.some((t) => t.id === urlTheme)) {
+  if (urlTheme && THEMES.some((th) => th.id === urlTheme)) {
     themeId = urlTheme;
     localStorage.setItem(THEME_KEY, urlTheme);
   }
 }
 
 function themeMeta(id: string) {
-  return THEMES.find((t) => t.id === id) ?? THEMES[0];
+  return THEMES.find((th) => th.id === id) ?? THEMES[0];
 }
 
 function applyTheme() {
@@ -112,13 +115,13 @@ $("#btn-theme").addEventListener("click", (e) => {
   e.stopPropagation();
   showMenu(
     e.currentTarget as HTMLElement,
-    THEMES.map((t) => [
-      (t.id === themeId ? "● " : "○ ") + t.label,
+    THEMES.map((th) => [
+      (th.id === themeId ? "● " : "○ ") + t(`theme.${th.id}`),
       () => {
-        themeId = t.id;
-        localStorage.setItem(THEME_KEY, t.id);
+        themeId = th.id;
+        localStorage.setItem(THEME_KEY, th.id);
         applyTheme();
-        toast(`Theme: ${t.label}`);
+        toast(t("toast.themeSet", t(`theme.${th.id}`)));
       },
     ]),
   );
@@ -129,11 +132,11 @@ $("#btn-export").addEventListener("click", (e) => {
   const title = docTitle();
   const src = () => view.state.doc.toString();
   showMenu(e.currentTarget as HTMLElement, [
-    ["📄 Export HTML", () => exportHTML(title, src())],
-    ["📝 Export Word (.doc)", () => exportWord(title, src())],
-    ["🧪 Export LaTeX (.tex)", () => exportLatex(mdInstance, title, src())],
-    ["📚 Export ePub (.epub)", () => void exportEpub(title, src())],
-    ["🖨 Print / PDF", () => printPDF(title, src())],
+    [t("menu.exportHtml"), () => exportHTML(title, src())],
+    [t("menu.exportWord"), () => exportWord(title, src())],
+    [t("menu.exportLatex"), () => exportLatex(mdInstance, title, src())],
+    [t("menu.exportEpub"), () => void exportEpub(title, src())],
+    [t("menu.printPdf"), () => printPDF(title, src())],
   ]);
 });
 
@@ -207,7 +210,7 @@ async function pasteImage(file: File) {
     view.dispatch(view.state.replaceSelection(`![${name}](${rel})`), {
       scrollIntoView: true,
     });
-    toast(`Image saved to ${rel}`);
+    toast(t("toast.imageSaved", rel));
     return;
   }
   const reader = new FileReader();
@@ -233,12 +236,12 @@ function setTypewriter(on: boolean) {
   localStorage.setItem(TYPEWRITER_KEY, on ? "1" : "0");
   $("#btn-typewriter").classList.toggle("on", on);
   $("#btn-typewriter").style.color = on ? "var(--accent)" : "";
-  stMode.textContent = `Markdown · Live Preview${on ? " · Typewriter" : ""}`;
+  stMode.textContent = t(on ? "status.modeTypewriter" : "status.mode");
 }
 
 $("#btn-typewriter").addEventListener("click", () => {
   setTypewriter(!typewriter);
-  toast(`Typewriter mode: ${!typewriter ? "off" : "on"}`);
+  toast(t("toast.typewriter", t(typewriter ? "common.on" : "common.off")));
 });
 
 /* ---------------- status / outline ---------------- */
@@ -250,7 +253,7 @@ function docTitle(): string {
 function refreshStatus() {
   const sel = view.state.selection.main;
   const line = view.state.doc.lineAt(sel.head);
-  stPos.textContent = `Ln ${line.number}, Col ${sel.head - line.from + 1}`;
+  stPos.textContent = t("status.lineCol", sel.head - line.from + 1, line.number);
   refreshCounts();
 }
 
@@ -258,7 +261,7 @@ function refreshCounts() {
   const doc = view.state.doc.toString();
   const cjk = (doc.match(/[\u3400-\u4dbf\u4e00-\u9fff]/g) || []).length;
   const words = (doc.match(/[A-Za-z0-9][A-Za-z0-9'’\-_]*/g) || []).length;
-  stCount.textContent = `${cjk + words} words · ${doc.length} chars`;
+  stCount.textContent = t("status.words", cjk + words, doc.length);
 }
 
 function refreshOutline() {
@@ -296,10 +299,10 @@ function renderTabs() {
     const close = document.createElement("button");
     close.className = "ot-tab-close";
     close.textContent = "×";
-    close.title = "Close tab";
+    close.title = t("common.close");
     close.onclick = (e) => {
       e.stopPropagation();
-      if (tab.dirty && !confirm(`Close ${tab.name} with unsaved changes?`)) return;
+      if (tab.dirty && !confirm(t("confirm.closeDirty", tab.name))) return;
       tabman.close(tab.id);
     };
     el.appendChild(close);
@@ -309,7 +312,7 @@ function renderTabs() {
   const plus = document.createElement("button");
   plus.className = "ot-tab-new";
   plus.textContent = "+";
-  plus.title = "New tab (welcome doc)";
+  plus.title = t("tabs.newTab");
   plus.onclick = () => tabman.openTab({ name: "Welcome.md", doc: WELCOME_MD, isWelcome: true });
   tabstrip.appendChild(plus);
   refreshHeader();
@@ -322,7 +325,7 @@ function renderRecents(entries: RecentEntry[]) {
   if (!entries.length) {
     const empty = document.createElement("div");
     empty.className = "ot-recent-empty";
-    empty.textContent = "Ctrl+O to open a file";
+    empty.textContent = t("sidebar.recentEmpty");
     recentsEl.appendChild(empty);
     return;
   }
@@ -348,7 +351,7 @@ async function openRecent(entry: RecentEntry) {
         perm = (await h.requestPermission?.({ mode: "readwrite" })) ?? "denied";
       }
       if (perm !== "granted") {
-        toast("Permission denied — reopening from disk");
+        toast(t("toast.permissionDenied"));
         return;
       }
       const file = await h.getFile();
@@ -356,7 +359,7 @@ async function openRecent(entry: RecentEntry) {
       tabman.openTab({ name: file.name, doc: text, handle: entry.handle });
       localStorage.removeItem(DRAFT_KEY);
       refreshAll();
-      toast(`Opened ${file.name}`);
+      toast(t("toast.opened", file.name));
     } else if (entry.tauriPath && isTauri()) {
       const t = window.__TAURI__!;
       const text = await t.fs!.readTextFile(entry.tauriPath);
@@ -365,7 +368,7 @@ async function openRecent(entry: RecentEntry) {
     }
   } catch (e) {
     console.error(e);
-    toast(`Could not reopen ${entry.name}`);
+    toast(t("toast.reopenFailed", entry.name));
     await removeRecent(entry.key);
     renderRecents(await listRecents());
   }
@@ -401,7 +404,7 @@ async function openFile() {
   localStorage.removeItem(DRAFT_KEY);
   refreshAll();
   view.focus();
-  toast(`Opened ${doc.name}`);
+  toast(t("toast.opened", doc.name));
 
   const key = doc.tauriPath ?? (doc.handle ? `fsa:${doc.name}` : null);
   if (key) {
@@ -414,7 +417,7 @@ async function openDropped(file: File) {
   const doc = await readDroppedFile(file);
   tabman.openTab({ name: doc.name, doc: doc.text });
   refreshAll();
-  toast(`Opened ${doc.name}`);
+  toast(t("toast.opened", doc.name));
 }
 
 async function saveFile() {
@@ -424,7 +427,7 @@ async function saveFile() {
     Object.assign(cur ?? {}, saved);
     tabman.markDirty(false);
     refreshAll();
-    toast(`Saved ${saved.name}`);
+    toast(t("toast.saved", saved.name));
     const key = saved.tauriPath ?? (saved.handle ? `fsa:${saved.name}` : null);
     if (key) {
       await saveRecent({ key, name: saved.name, handle: saved.handle, tauriPath: saved.tauriPath });

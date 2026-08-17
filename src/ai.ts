@@ -1,4 +1,5 @@
 import type { EditorView } from "@codemirror/view";
+import { t } from "./i18n";
 
 /**
  * Bring-your-own-key AI assistance. Everything stays between the user
@@ -41,10 +42,10 @@ const PROMPTS: Record<string, string> = {
     "as a markdown list. Reply with the list ONLY.",
 };
 
-export const AI_ACTIONS: { id: string; label: string; hint: string }[] = [
-  { id: "polish", label: "✨ Polish", hint: "Fix grammar & flow, keep syntax" },
-  { id: "translate", label: "文A Translate", hint: "EN ⇄ 中文, auto-detected" },
-  { id: "summarize", label: "≡ Summarize", hint: "3–5 bullet points" },
+export const AI_ACTIONS: { id: string; key: string; hint: string }[] = [
+  { id: "polish", key: "ai.action.polish", hint: "Fix grammar & flow, keep syntax" },
+  { id: "translate", key: "ai.action.translate", hint: "EN ⇄ 中文, auto-detected" },
+  { id: "summarize", key: "ai.action.summarize", hint: "3–5 bullet points" },
 ];
 
 export interface AIPanel {
@@ -67,12 +68,12 @@ export function buildAIPanel(onAction: (id: string) => void): AIPanel {
   modal.className = "ot-modal";
 
   modal.innerHTML = `
-    <h3>✨ AI Assist <span style="font-weight:400;font-size:11px;color:var(--fg-faint)">(bring your own key)</span></h3>
-    <label>API Base URL <span style="opacity:.6">(any OpenAI-compatible endpoint)</span></label>
+    <h3>${t("ai.title")} <span style="font-weight:400;font-size:11px;color:var(--fg-faint)">(${t("ai.subtitle")})</span></h3>
+    <label>${t("ai.baseUrl")} <span style="opacity:.6">${t("ai.baseUrlHint")}</span></label>
     <input data-k="baseUrl" value="${escapeAttr(s.baseUrl)}" spellcheck="false">
-    <label>API Key <span style="opacity:.6">(stored only in this browser)</span></label>
+    <label>${t("ai.apiKey")} <span style="opacity:.6">${t("ai.apiKeyHint")}</span></label>
     <input data-k="apiKey" type="password" value="${escapeAttr(s.apiKey)}" spellcheck="false" placeholder="sk-…">
-    <label>Model</label>
+    <label>${t("ai.model")}</label>
     <input data-k="model" value="${escapeAttr(s.model)}" spellcheck="false">`;
 
   const presetRow = document.createElement("div");
@@ -97,7 +98,7 @@ export function buildAIPanel(onAction: (id: string) => void): AIPanel {
   for (const a of AI_ACTIONS) {
     const b = document.createElement("button");
     b.className = "ot-btn";
-    b.textContent = a.label;
+    b.textContent = t(a.key);
     b.title = a.hint;
     b.addEventListener("click", () => {
       saveFromInputs();
@@ -110,8 +111,8 @@ export function buildAIPanel(onAction: (id: string) => void): AIPanel {
 
   const btnRow = document.createElement("div");
   btnRow.className = "ot-modal-actions";
-  btnRow.innerHTML = `<button class="ot-btn" data-act="close">Close</button>
-    <button class="ot-btn primary" data-act="save">Save</button>`;
+  btnRow.innerHTML = `<button class="ot-btn" data-act="close">${t("common.close")}</button>
+    <button class="ot-btn primary" data-act="save">${t("settings.save")}</button>`;
   modal.appendChild(btnRow);
 
   mask.appendChild(modal);
@@ -131,7 +132,7 @@ export function buildAIPanel(onAction: (id: string) => void): AIPanel {
     if (!btn) return;
     if (btn.dataset.act === "save") {
       saveFromInputs();
-      toast("AI settings saved");
+      toast(t("toast.aiSettingsSaved"));
     }
     close();
   });
@@ -147,7 +148,7 @@ export function buildAIPanel(onAction: (id: string) => void): AIPanel {
 export async function runAI(view: EditorView, id: string): Promise<void> {
   const settings = getAISettings();
   if (!settings.apiKey) {
-    toast("Set your API key first (✨ button)");
+    toast(t("toast.aiKeyMissing"));
     return;
   }
   const sys = PROMPTS[id];
@@ -157,11 +158,11 @@ export async function runAI(view: EditorView, id: string): Promise<void> {
   const useWhole = from === to;
   const text = useWhole ? view.state.doc.toString() : view.state.sliceDoc(from, to);
   if (!text.trim()) {
-    toast("Nothing to work on");
+    toast(t("toast.aiNothing"));
     return;
   }
 
-  toast(`AI ${id}… (may take a few seconds)`);
+  toast(t("toast.aiRunning", id));
   try {
     const res = await fetch(`${settings.baseUrl.replace(/\/$/, "")}/chat/completions`, {
       method: "POST",
@@ -193,9 +194,9 @@ export async function runAI(view: EditorView, id: string): Promise<void> {
       selection: { anchor: from },
       scrollIntoView: true,
     });
-    toast("Done — Ctrl+Z to undo");
+    toast(t("toast.aiDone"));
   } catch (e) {
-    toast(`AI failed: ${(e as Error).message}`);
+    toast(t("toast.aiFailed", (e as Error).message));
   }
 }
 

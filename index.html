@@ -42,31 +42,31 @@
     <div id="app">
       <header id="topbar">
         <div class="tb-left">
-          <button id="btn-sidebar" class="tb-btn" title="Toggle outline (Ctrl+\)">☰</button>
+          <button id="btn-sidebar" class="tb-btn" data-i18n-title="topbar.toggleOutline" title="Toggle outline (Ctrl+\)">☰</button>
           <span id="doc-title" class="doc-title">Untitled.md</span>
           <span id="doc-dirty" class="doc-dirty" hidden>●</span>
         </div>
         <div class="tb-right">
-          <button id="btn-settings" class="tb-btn" title="Editor preferences">⚙</button>
-          <button id="btn-typewriter" class="tb-btn" title="Typewriter mode">⌶</button>
-          <button id="btn-ai" class="tb-btn" title="AI settings">✨</button>
-          <button id="btn-export" class="tb-btn" title="Export / Print">⇩</button>
-          <button id="btn-theme" class="tb-btn" title="Theme">◐</button>
+          <button id="btn-settings" class="tb-btn" data-i18n-title="topbar.settings" title="Editor preferences">⚙</button>
+          <button id="btn-typewriter" class="tb-btn" data-i18n-title="topbar.typewriter" title="Typewriter mode">⌶</button>
+          <button id="btn-ai" class="tb-btn" data-i18n-title="topbar.aiSettings" title="AI settings">✨</button>
+          <button id="btn-export" class="tb-btn" data-i18n-title="topbar.export" title="Export / Print">⇩</button>
+          <button id="btn-theme" class="tb-btn" data-i18n-title="topbar.theme" title="Theme">◐</button>
         </div>
       </header>
       <div id="tabstrip"></div>
       <div id="main">
         <aside id="sidebar">
           <div class="sb-head">
-            <span class="sb-title">Files</span>
-            <button id="btn-ws-open" class="sb-btn" title="Open folder as workspace">📂</button>
-            <button id="btn-ws-new" class="sb-btn" title="New file in workspace" hidden>＋</button>
-            <button id="btn-ws-refresh" class="sb-btn" title="Refresh tree" hidden>⟳</button>
+            <span class="sb-title" data-i18n="sidebar.files">Files</span>
+            <button id="btn-ws-open" class="sb-btn" data-i18n-title="sidebar.openFolder" title="Open folder as workspace">📂</button>
+            <button id="btn-ws-new" class="sb-btn" data-i18n-title="sidebar.newFile" title="New file in workspace" hidden>＋</button>
+            <button id="btn-ws-refresh" class="sb-btn" data-i18n-title="sidebar.refresh" title="Refresh tree" hidden>⟳</button>
           </div>
           <nav id="filetree"></nav>
-          <div class="sb-subtitle">Recent</div>
+          <div class="sb-subtitle" data-i18n="sidebar.recent">Recent</div>
           <nav id="recents"></nav>
-          <div class="sb-title" style="margin-top: 14px">Outline</div>
+          <div class="sb-title" data-i18n="sidebar.outline" style="margin-top: 14px">Outline</div>
           <nav id="outline"></nav>
         </aside>
         <div id="editor-wrap">

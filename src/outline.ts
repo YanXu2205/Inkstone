@@ -1,5 +1,6 @@
 import type { EditorView } from "@codemirror/view";
 import { EditorView as EV } from "@codemirror/view";
+import { t } from "./i18n";
 
 export interface Heading {
   level: number;
@@ -41,7 +42,7 @@ export function renderOutline(
   if (!headings.length) {
     const empty = document.createElement("div");
     empty.className = "ot-outline-empty";
-    empty.textContent = "No headings yet — start with #";
+    empty.textContent = t("outline.empty");
     container.appendChild(empty);
     return;
   }
