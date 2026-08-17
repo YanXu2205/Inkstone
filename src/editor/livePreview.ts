@@ -5,10 +5,10 @@ import {
   ViewPlugin,
   ViewUpdate,
 } from "@codemirror/view";
+import { StateEffect } from "@codemirror/state";
 import { syntaxTree } from "@codemirror/language";
-import { EditorSelection, EditorState, Range } from "@codemirror/state";
-import type { SyntaxNodeRef } from "@lezer/common";
-import { HrWidget, ImageWidget, MathWidget, TaskCheckboxWidget } from "./widgets";
+import { EditorSelection, EditorState, Range, StateField } from "@codemirror/state";import type { SyntaxNodeRef } from "@lezer/common";
+import { HrWidget, ImageWidget, MathWidget, MermaidWidget, TaskCheckboxWidget } from "./widgets";
 import { mathBody } from "./math";
 
 /**
@@ -113,6 +113,10 @@ function buildDecorations(view: EditorView): DecorationSet {
           const last = doc.lineAt(n.to);
           const info = n.getChild("CodeInfo");
           const lang = info ? doc.sliceString(info.from, info.to).trim() : "";
+
+          // ```mermaid blocks are handled by the mermaidBlocks state field
+          // (block replaces may not come from view plugins).
+
           for (let line = first; ; line = doc.line(line.number + 1)) {
             const cls = ["ot-code-line"];
             const attrs: Record<string, string> = {};
@@ -296,6 +300,81 @@ function buildDecorations(view: EditorView): DecorationSet {
   return Decoration.set(ranges, true);
 }
 
+/** Dispatch to force a decoration rebuild (e.g. after a theme switch). */
+export const refreshDecos = StateEffect.define<void>();
+
+/**
+ * ```mermaid blocks → rendered diagrams.
+ *
+ * Block replace decorations may not be provided by view plugins, so
+ * this lives in a StateField. Because the syntax tree parses
+ * asynchronously, a small watcher plugin signals the field (via a
+ * microtask dispatch — plugins may not dispatch inside update) every
+ * time the tree, doc, selection or theme changes.
+ */
+const recomputeMermaid = StateEffect.define<void>();
+
+export const mermaidWatcher = ViewPlugin.fromClass(
+  class {
+    update(u: ViewUpdate) {
+      if (
+        u.docChanged ||
+        u.selectionSet ||
+        u.viewportChanged ||
+        syntaxTree(u.startState) !== syntaxTree(u.state) ||
+        u.transactions.some((tr) => tr.effects.some((e) => e.is(refreshDecos)))
+      ) {
+        const view = u.view;
+        queueMicrotask(() => view.dispatch({ effects: recomputeMermaid.of() }));
+      }
+    }
+  },
+);
+
+export const mermaidBlocks = StateField.define<DecorationSet>({
+  create(state) {
+    return safeBuildMermaid(state);
+  },
+  update(value, tr) {
+    for (const e of tr.effects) if (e.is(recomputeMermaid)) return safeBuildMermaid(tr.state);
+    return value;
+  },
+  provide: (field) => EditorView.decorations.from(field),
+});
+
+function safeBuildMermaid(state: EditorState): DecorationSet {
+  try {
+    const ranges: Range<Decoration>[] = [];
+    const doc = state.doc;
+    syntaxTree(state).iterate({
+      enter: (ref) => {
+        if (ref.name !== "FencedCode") return;
+        const n = ref.node;
+        const info = n.getChild("CodeInfo");
+        const lang = info ? doc.sliceString(info.from, info.to).trim() : "";
+        if (lang !== "mermaid" || touched(state.selection, n.from, n.to)) return;
+        const first = doc.lineAt(n.from);
+        const last = doc.lineAt(n.to);
+        const code = doc.sliceString(first.to + 1, last.from);
+        ranges.push(
+          Decoration.replace({
+            widget: new MermaidWidget(
+              n.from,
+              code,
+              document.documentElement.dataset.tone === "dark",
+            ),
+            block: true,
+          }).range(first.from, last.to),
+        );
+      },
+    });
+    return Decoration.set(ranges, true);
+  } catch (e) {
+    console.error("[mermaidBlocks] build failed:", e);
+    return Decoration.none;
+  }
+}
+
 export const livePreview = ViewPlugin.fromClass(
   class {
     decorations: DecorationSet;
@@ -310,7 +389,8 @@ export const livePreview = ViewPlugin.fromClass(
         u.viewportChanged ||
         u.selectionSet ||
         u.focusChanged ||
-        syntaxTree(u.startState) !== syntaxTree(u.state)
+        syntaxTree(u.startState) !== syntaxTree(u.state) ||
+        u.transactions.some((tr) => tr.effects.some((e) => e.is(refreshDecos)))
       ) {
         this.decorations = safeBuild(u.view);
       }

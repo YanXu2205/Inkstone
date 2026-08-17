@@ -351,6 +351,31 @@ html[data-theme="dark"] .ot-t-typeName {
   color: var(--fg-dim);
 }
 
+/* ---- mermaid diagrams ---- */
+
+.ot-mermaid {
+  text-align: center;
+  padding: 10px 0;
+  cursor: default;
+}
+
+.ot-mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.ot-mermaid-error {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  border: 1px dashed var(--fg-faint);
+  border-radius: 8px;
+  padding: 10px 14px;
+  text-align: left;
+  overflow-x: auto;
+  color: var(--fg-dim);
+}
+
 /* ---- tables ---- */
 
 .ot-table-line {

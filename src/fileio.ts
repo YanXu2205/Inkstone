@@ -101,14 +101,17 @@ export async function readDroppedFile(file: File): Promise<OpenedDoc> {
   return { name: file.name, text: await file.text() };
 }
 
+/** Identity needed to save a document in place. */
+export type SaveTarget = Pick<OpenedDoc, "name" | "handle" | "tauriPath">;
+
 /**
- * Save `text`. Pass the previous `doc` to save in place; otherwise a
+ * Save `text`. Pass the previous target to save in place; otherwise a
  * save-as picker (or a download) is triggered. Returns the (possibly
  * new) document identity.
  */
 export async function saveMarkdown(
   text: string,
-  doc: OpenedDoc | null,
+  doc: SaveTarget | null,
 ): Promise<OpenedDoc | null> {
   const suggested = doc?.name || "untitled.md";
 
@@ -118,7 +121,7 @@ export async function saveMarkdown(
       const writable = await doc.handle.createWritable();
       await writable.write(text);
       await writable.close();
-      return doc;
+      return { name: doc.name, text, handle: doc.handle };
     } catch (e) {
       console.error(e);
     }

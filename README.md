@@ -42,15 +42,17 @@ Typora is lovely but **paid and closed-source**. MarkText was the beloved free a
 
 - **🖱 True seamless live preview** — headings, emphasis, links, images, task lists and rules render as you type; syntax appears only where your caret is
 - **🧮 KaTeX math** — `$…$` inline and `$$…$$` display formulas, rendered live via a custom Lezer inline parser
+- **🧜 Mermaid diagrams** — ` ```mermaid ` blocks render as flowcharts & graphs, re-theming with the app
 - **📋 Styled GFM tables** — real headers, column alignment from the delimiter row, and the raw `|---|` separator hidden until you edit
+- **🗂 Multi-tab workspace** — every tab keeps its own undo history, cursor & viewport; recent files reopen with one click (handles persisted in IndexedDB)
 - **🖼 Inline images** — paste from clipboard, fully offline via data URLs
 - **✅ Interactive checkboxes** — click to toggle `- [ ]` / `- [x]`
 - **📦 Syntax-highlighted code blocks** with a clean language chip (100+ languages)
-- **🗂 Document outline** with click-to-jump (`Ctrl+\` to toggle)
+- **🌓 Five themes** — Light, Dark, Solarized, Nord & Dracula, plus auto (system)
+- **⌨️ Typewriter mode** & document outline with click-to-jump (`Ctrl+\`)
 - **💾 Real file handling** — open / save / save-as `.md`; in-place saving on Chrome, Edge & the desktop app
 - **📄 Export** — self-contained styled HTML, or Print → PDF
 - **📲 Installable PWA** — works fully offline; install it from the browser like a native app
-- **🌙 Light / dark / auto** themes
 - **✨ AI assist (optional)** — polish, translate (EN ⇄ 中文), summarize — with *your own* OpenAI-compatible API key. Nothing leaves your machine except the text you choose.
 - **⌨️ Typora-style shortcuts** — `Ctrl+B` / `Ctrl+I` / `Ctrl+E` / `Ctrl+K` toggle around words, `Enter` continues lists & quotes, `Ctrl+S` saves
 - **📦 Tiny core** — the whole editor is ~40 kB gzipped (excluding language packs & KaTeX), no Electron in sight when running in a browser
@@ -105,9 +107,11 @@ When your caret enters a construct, its decorations lift and the raw syntax show
 
 - [x] KaTeX math (`$…$` / `$$…$$`)
 - [x] Styled GFM tables
+- [x] Mermaid diagrams
+- [x] Multi-tab workspace & recent files
+- [x] Five built-in themes + typewriter mode
 - [x] PWA — installable & offline
-- [ ] Workspace: folders, multi-tab, recent files
-- [ ] Mermaid diagrams
+- [ ] File tree / folder workspace
 - [ ] Custom CSS themes & font settings
 - [ ] Footnotes, TOC generation, image file management
 - [ ] Local AI via WebLLM / Ollama

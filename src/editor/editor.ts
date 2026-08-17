@@ -17,7 +17,7 @@ import { tags as t } from "@lezer/highlight";
 import type { MarkdownParser } from "@lezer/markdown";
 import "katex/dist/katex.min.css";
 
-import { livePreview } from "./livePreview";
+import { livePreview, mermaidBlocks, mermaidWatcher } from "./livePreview";
 import { otHighlight } from "./theme";
 import { mathInlineParser } from "./math";
 import {
@@ -90,6 +90,8 @@ function baseExtensions(): Extension[] {
     }),
     syntaxHighlighting(otHighlight),
     livePreview,
+    mermaidBlocks,
+    mermaidWatcher,
   ];
 }
 

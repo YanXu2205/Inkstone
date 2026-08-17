@@ -9,6 +9,25 @@ const ICON =
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs><rect width="64" height="64" rx="14" fill="url(#g)"/><rect x="14" y="18" width="36" height="5" rx="2.5" fill="#fff" opacity=".95"/><rect x="14" y="29.5" width="24" height="5" rx="2.5" fill="#fff" opacity=".8"/><rect x="14" y="41" width="30" height="5" rx="2.5" fill="#fff" opacity=".65"/></svg>`,
   );
 
+export const MERMAID_DEMO_MD = `# Mermaid demo
+
+\`\`\`mermaid
+graph LR
+  M[One Markdown buffer] --> L{Live preview}
+  L -->|Typora| P[Paid & closed]
+  L -->|OpenTypora| F[Free & open]
+\`\`\`
+
+\`\`\`mermaid
+flowchart TD
+  A[Start] --> B{Editor open?}
+  B -- no --> C[Open a .md file]
+  B -- yes --> D[Type beautiful prose]
+  C --> D
+  D --> E[Save locally]
+\`\`\`
+`;
+
 export const WELCOME_MD = `# Welcome to OpenTypora 👋
 
 A **free, open-source, local-first** Markdown editor with a seamless live preview —
@@ -56,6 +75,15 @@ Click into a formula to edit its raw TeX; click away and it renders again.
 \`\`\`ts
 // the live-preview engine in one sentence:
 const view = new EditorView({ doc: markdown, extensions: [livePreview] });
+\`\`\`
+
+## 🧜 Mermaid diagrams render inline
+
+\`\`\`mermaid
+graph LR
+  M[One Markdown buffer] --> L{Live preview}
+  L -->|Typora| P[Paid & closed]
+  L -->|OpenTypora| F[Free & open]
 \`\`\`
 
 ## 🖼 Images render inline

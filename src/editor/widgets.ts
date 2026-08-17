@@ -103,9 +103,67 @@ export class HrWidget extends WidgetType {
   }
 }
 
-/** KaTeX-rendered formula; click to reveal the raw TeX. */
-export class MathWidget extends WidgetType {
+/** Mermaid diagram replacing a ```mermaid fenced block. */
+export class MermaidWidget extends WidgetType {
+  private static seq = 0;
+  readonly id = `ot-mermaid-${++MermaidWidget.seq}`;
+
   constructor(
+    readonly pos: number,
+    readonly code: string,
+    readonly dark: boolean,
+  ) {
+    super();
+  }
+
+  eq(other: MermaidWidget) {
+    return other.pos === this.pos && other.code === this.code && other.dark === this.dark;
+  }
+
+  toDOM(view: EditorView) {
+    const wrap = document.createElement("div");
+    wrap.className = "ot-mermaid";
+    wrap.textContent = "⏳ rendering diagram…";
+
+    this.render(wrap).catch((e) => {
+      wrap.textContent = "";
+      const pre = document.createElement("pre");
+      pre.className = "ot-mermaid-error";
+      pre.textContent = `${this.code}\n\n— ${String((e as Error)?.message || e)}`;
+      wrap.appendChild(pre);
+    });
+
+    wrap.addEventListener("mousedown", (e) => {
+      if (e.button === 0 && e.offsetX < 0) {
+        // clicking the left gutter reveals the raw source
+        e.preventDefault();
+        view.dispatch({ selection: { anchor: this.pos + 4 }, scrollIntoView: true });
+      }
+    });
+    return wrap;
+  }
+
+  private async render(wrap: HTMLElement) {
+    const mermaid = (await import("mermaid")).default;
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: this.dark ? "dark" : "default",
+      fontFamily: getComputedStyle(document.documentElement)
+        .getPropertyValue("--font-ui")
+        .trim() || undefined,
+    });
+    const { svg } = await mermaid.render(this.id, this.code);
+    wrap.textContent = "";
+    wrap.innerHTML = svg;
+  }
+
+  ignoreEvent() {
+    return false;
+  }
+}
+
+/** KaTeX-rendered formula; click to reveal the raw TeX. */
+export class MathWidget extends WidgetType {  constructor(
     readonly pos: number,
     readonly tex: string,
     readonly display: boolean,

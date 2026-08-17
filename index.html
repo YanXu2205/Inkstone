@@ -14,10 +14,21 @@
     <script>
       // Apply saved theme before first paint to avoid flashing.
       const t = localStorage.getItem("ot.theme") || "auto";
+      const darkTones = { dark: 1, nord: 1, dracula: 1 };
       const dark =
-        t === "dark" ||
-        (t === "auto" && matchMedia("(prefers-color-scheme: dark)").matches);
-      document.documentElement.dataset.theme = dark ? "dark" : "light";
+        t === "auto"
+          ? matchMedia("(prefers-color-scheme: dark)").matches
+          : !!darkTones[t];
+      document.documentElement.dataset.theme = t;
+      document.documentElement.dataset.tone = dark ? "dark" : "light";
+      // error surfacing for diagnostics
+      window.__errs = [];
+      window.addEventListener("error", (e) =>
+        window.__errs.push(String(e.error?.stack || e.message)),
+      );
+      window.addEventListener("unhandledrejection", (e) =>
+        window.__errs.push("REJ: " + String(e.reason?.stack || e.reason)),
+      );
     </script>
   </head>
   <body>
@@ -29,14 +40,18 @@
           <span id="doc-dirty" class="doc-dirty" hidden>●</span>
         </div>
         <div class="tb-right">
+          <button id="btn-typewriter" class="tb-btn" title="Typewriter mode">⌶</button>
           <button id="btn-ai" class="tb-btn" title="AI settings">✨</button>
           <button id="btn-export" class="tb-btn" title="Export / Print">⇩</button>
-          <button id="btn-theme" class="tb-btn" title="Toggle theme">◐</button>
+          <button id="btn-theme" class="tb-btn" title="Theme">◐</button>
         </div>
       </header>
+      <div id="tabstrip"></div>
       <div id="main">
         <aside id="sidebar">
-          <div class="sb-title">Outline</div>
+          <div class="sb-title">Files</div>
+          <nav id="recents"></nav>
+          <div class="sb-title" style="margin-top: 14px">Outline</div>
           <nav id="outline"></nav>
         </aside>
         <div id="editor-wrap">

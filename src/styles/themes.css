@@ -1,0 +1,77 @@
+/* ===== Built-in themes =====
+   Base variables live in base.css ([data-theme="light"/"dark"]);
+   each block below overrides the same variables. */
+
+html[data-theme="solarized"] {
+  --bg: #fdf6e3;
+  --bg-side: #eee8d5;
+  --bg-hover: #e2dbc4;
+  --fg: #073642;
+  --fg-dim: #586e75;
+  --fg-faint: #93a1a1;
+  --border: #ddd6c1;
+  --accent: #268bd2;
+  --accent-soft: rgba(38, 139, 210, 0.15);
+  --code-bg: #f3ecd8;
+  --quote-bar: #93a1a1;
+  --sel: rgba(38, 139, 210, 0.22);
+  --shadow: 0 1px 3px rgba(7, 54, 66, 0.12);
+}
+
+html[data-theme="nord"] {
+  --bg: #2e3440;
+  --bg-side: #292e39;
+  --bg-hover: #3b4252;
+  --fg: #eceff4;
+  --fg-dim: #a7b1c4;
+  --fg-faint: #616e88;
+  --border: #3b4252;
+  --accent: #88c0d0;
+  --accent-soft: rgba(136, 192, 208, 0.16);
+  --code-bg: #272c36;
+  --quote-bar: #4c566a;
+  --sel: rgba(136, 192, 208, 0.28);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="dracula"] {
+  --bg: #282a36;
+  --bg-side: #21222c;
+  --bg-hover: #343746;
+  --fg: #f8f8f2;
+  --fg-dim: #b6bdca;
+  --fg-faint: #6272a4;
+  --border: #3a3f4e;
+  --accent: #bd93f9;
+  --accent-soft: rgba(189, 147, 249, 0.18);
+  --code-bg: #21222c;
+  --quote-bar: #6272a4;
+  --sel: rgba(189, 147, 249, 0.3);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+/* code token palettes for the dark themes */
+html[data-theme="nord"] .ot-t-keyword,
+html[data-theme="dracula"] .ot-t-keyword {
+  color: #81a2ff;
+}
+
+html[data-theme="nord"] .ot-t-string,
+html[data-theme="dracula"] .ot-t-string {
+  color: #a3be8c;
+}
+
+html[data-theme="nord"] .ot-t-number,
+html[data-theme="dracula"] .ot-t-number {
+  color: #b48ead;
+}
+
+html[data-theme="nord"] .ot-t-func,
+html[data-theme="dracula"] .ot-t-func {
+  color: #ebcb8b;
+}
+
+html[data-theme="nord"] .ot-t-typeName,
+html[data-theme="dracula"] .ot-t-typeName {
+  color: #8fbcbb;
+}
