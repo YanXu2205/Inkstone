@@ -13,9 +13,13 @@ import { search, searchKeymap } from "@codemirror/search";
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
 import { indentUnit, syntaxHighlighting } from "@codemirror/language";
+import { tags as t } from "@lezer/highlight";
+import type { MarkdownParser } from "@lezer/markdown";
+import "katex/dist/katex.min.css";
 
 import { livePreview } from "./livePreview";
 import { otHighlight } from "./theme";
+import { mathInlineParser } from "./math";
 import {
   insertLink,
   toggleBold,
@@ -71,7 +75,19 @@ function baseExtensions(): Extension[] {
     indentUnit.of("  "),
     search(),
     // markdownLanguage = CommonMark + GFM (tables, task lists, strikethrough…)
-    markdown({ base: markdownLanguage, codeLanguages: languages }),
+    // plus our $…$ / $$…$$ math extension.
+    markdown({
+      base: {
+        parser: (markdownLanguage.parser as MarkdownParser).configure({
+          defineNodes: [
+            { name: "InlineMath", style: t.monospace },
+            { name: "DisplayMath", style: t.monospace },
+          ],
+          parseInline: [mathInlineParser],
+        }),
+      } as unknown as typeof markdownLanguage,
+      codeLanguages: languages,
+    }),
     syntaxHighlighting(otHighlight),
     livePreview,
   ];
@@ -123,6 +139,16 @@ function keymapLayer(cb: EditorCallbacks): Extension {
     { key: "Mod-e", preventDefault: true, run: toggleInlineCode },
     { key: "Mod-Shift-x", preventDefault: true, run: toggleStrike },
     { key: "Mod-k", preventDefault: true, run: insertLink },
+    {
+      key: "Mod-End",
+      preventDefault: true,
+      run: (v) => (v.dispatch({ selection: { anchor: v.state.doc.length }, scrollIntoView: true }), true),
+    },
+    {
+      key: "Mod-Home",
+      preventDefault: true,
+      run: (v) => (v.dispatch({ selection: { anchor: 0 }, scrollIntoView: true }), true),
+    },
     ...searchKeymap,
     ...historyKeymap,
     ...defaultKeymap,

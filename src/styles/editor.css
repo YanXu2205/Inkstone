@@ -320,3 +320,53 @@ html[data-theme="dark"] .ot-t-typeName {
 .ot-t-meta {
   color: var(--fg-faint);
 }
+
+/* ---- math (KaTeX widgets) ---- */
+
+.ot-math {
+  cursor: pointer;
+}
+
+.ot-math .katex {
+  font-size: 1.05em;
+}
+
+.ot-math-display {
+  display: block;
+  text-align: center;
+  margin: 10px 0;
+}
+
+.ot-math-display .katex-display {
+  margin: 0;
+}
+
+.ot-math-error {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--code-bg);
+  border: 1px dashed var(--fg-faint);
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: var(--fg-dim);
+}
+
+/* ---- tables ---- */
+
+.ot-table-line {
+  border-bottom: 1px solid var(--border);
+  padding: 4px 2px !important;
+}
+
+.ot-th {
+  font-weight: 650;
+}
+
+.ot-td,
+.ot-th {
+  padding: 0 12px;
+}
+
+.ot-th:first-of-type {
+  padding-left: 2px;
+}

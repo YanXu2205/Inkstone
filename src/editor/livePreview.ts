@@ -8,7 +8,8 @@ import {
 import { syntaxTree } from "@codemirror/language";
 import { EditorSelection, EditorState, Range } from "@codemirror/state";
 import type { SyntaxNodeRef } from "@lezer/common";
-import { HrWidget, ImageWidget, TaskCheckboxWidget } from "./widgets";
+import { HrWidget, ImageWidget, MathWidget, TaskCheckboxWidget } from "./widgets";
+import { mathBody } from "./math";
 
 /**
  * The heart of OpenTypora: a Typora-style "seamless live preview".
@@ -200,6 +201,60 @@ function buildDecorations(view: EditorView): DecorationSet {
           break;
         }
 
+        /* ---------------- tables ---------------- */
+
+        case "Table": {
+          // Column alignment from the `| :---: | ---: |` delimiter row
+          // (a direct child of Table, sibling of TableHeader).
+          const aligns: ("left" | "center" | "right")[] = [];
+          for (let ch = n.firstChild; ch; ch = ch.nextSibling) {
+            if (ch.name !== "TableDelimiter") continue;
+            const raw = doc.sliceString(ch.from, ch.to);
+            for (const seg of raw.split("|")) {
+              const s = seg.trim();
+              if (!s || !/^-+:?-*:?-*$/.test(s)) continue;
+              const l = s.startsWith(":");
+              const r = s.endsWith(":");
+              aligns.push(l && r ? "center" : r ? "right" : "left");
+            }
+          }
+          for (let row = n.firstChild; row; row = row.nextSibling) {
+            const isHeader = row.name === "TableHeader";
+            let col = 0;
+            for (let cell = row.firstChild; cell; cell = cell.nextSibling) {
+              if (cell.name !== "TableCell") continue;
+              if (cell.to > cell.from) {
+                ranges.push(
+                  Decoration.mark({
+                    class: isHeader ? "ot-th" : "ot-td",
+                    attributes: { style: `text-align:${aligns[col] ?? "left"}` },
+                  }).range(cell.from, cell.to),
+                );
+              }
+              col++;
+            }
+          }
+          // Ruled look: light bottom border under every table line.
+          for (let pos = n.from; pos <= n.to; ) {
+            const line = doc.lineAt(pos);
+            addLineClass(line.from, "ot-table-line");
+            if (line.to >= n.to) break;
+            pos = line.to + 1;
+          }
+          break;
+        }
+
+        case "TableDelimiter":
+          // Hide the `---|---` separator row while the caret is outside.
+          {
+            let table = parent;
+            while (table && table.name !== "Table") table = table.parent;
+            if (table && !touched(sel, table.from, table.to)) {
+              hide(n.from, n.to);
+            }
+          }
+          break;
+
         /* ---------------- interactive widgets ---------------- */
 
         case "TaskMarker": {
@@ -209,6 +264,19 @@ function buildDecorations(view: EditorView): DecorationSet {
           ranges.push(
             Decoration.replace({
               widget: new TaskCheckboxWidget(n.from, text === "[x]"),
+            }).range(n.from, n.to),
+          );
+          break;
+        }
+
+        case "InlineMath":
+        case "DisplayMath": {
+          if (touched(sel, n.from, n.to)) break;
+          const { tex, display } = mathBody(doc.sliceString(n.from, n.to));
+          if (!tex) break;
+          ranges.push(
+            Decoration.replace({
+              widget: new MathWidget(n.from, tex, display),
             }).range(n.from, n.to),
           );
           break;

@@ -1,4 +1,5 @@
 import { EditorView, WidgetType } from "@codemirror/view";
+import katex from "katex";
 
 /**
  * Inline image — replaces the raw `![alt](src)` syntax with the actual
@@ -99,5 +100,52 @@ export class HrWidget extends WidgetType {
 
   ignoreEvent() {
     return true;
+  }
+}
+
+/** KaTeX-rendered formula; click to reveal the raw TeX. */
+export class MathWidget extends WidgetType {
+  constructor(
+    readonly pos: number,
+    readonly tex: string,
+    readonly display: boolean,
+  ) {
+    super();
+  }
+
+  eq(other: MathWidget) {
+    return (
+      other.pos === this.pos &&
+      other.tex === this.tex &&
+      other.display === this.display
+    );
+  }
+
+  toDOM(view: EditorView) {
+    const span = document.createElement("span");
+    span.className = "ot-math" + (this.display ? " ot-math-display" : "");
+    try {
+      span.innerHTML = katex.renderToString(this.tex, {
+        displayMode: this.display,
+        throwOnError: true,
+      });
+    } catch {
+      span.textContent = this.tex;
+      span.classList.add("ot-math-error");
+    }
+    span.addEventListener("mousedown", (e) => {
+      if (e.button === 0) {
+        e.preventDefault();
+        view.dispatch({
+          selection: { anchor: this.pos + (this.display ? 2 : 1) },
+          scrollIntoView: true,
+        });
+      }
+    });
+    return span;
+  }
+
+  ignoreEvent() {
+    return false;
   }
 }

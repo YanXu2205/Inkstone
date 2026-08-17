@@ -30,26 +30,30 @@ Typora is lovely but **paid and closed-source**. MarkText was the beloved free a
 |                    | Typora        | MarkText        | **OpenTypora**     |
 | ------------------ | ------------- | --------------- | ------------------ |
 | Seamless WYSIWYG   | ✅            | ✅              | ✅                 |
+| Math & tables      | ✅            | ✅              | ✅                 |
 | Price              | paid          | free            | **free, forever**  |
 | Source             | closed        | open (dormant)  | **open, active**   |
 | Local-first        | ✅            | ✅              | ✅                 |
-| Runs in a browser  | ❌            | ❌              | ✅                 |
+| Runs in a browser  | ❌            | ❌              | ✅ (PWA)           |
 | Bring-your-own-key AI | ❌         | ❌              | ✅                 |
 | Telemetry          | —             | none            | **none**           |
 
 ## Features
 
 - **🖱 True seamless live preview** — headings, emphasis, links, images, task lists and rules render as you type; syntax appears only where your caret is
+- **🧮 KaTeX math** — `$…$` inline and `$$…$$` display formulas, rendered live via a custom Lezer inline parser
+- **📋 Styled GFM tables** — real headers, column alignment from the delimiter row, and the raw `|---|` separator hidden until you edit
 - **🖼 Inline images** — paste from clipboard, fully offline via data URLs
 - **✅ Interactive checkboxes** — click to toggle `- [ ]` / `- [x]`
 - **📦 Syntax-highlighted code blocks** with a clean language chip (100+ languages)
 - **🗂 Document outline** with click-to-jump (`Ctrl+\` to toggle)
 - **💾 Real file handling** — open / save / save-as `.md`; in-place saving on Chrome, Edge & the desktop app
 - **📄 Export** — self-contained styled HTML, or Print → PDF
+- **📲 Installable PWA** — works fully offline; install it from the browser like a native app
 - **🌙 Light / dark / auto** themes
 - **✨ AI assist (optional)** — polish, translate (EN ⇄ 中文), summarize — with *your own* OpenAI-compatible API key. Nothing leaves your machine except the text you choose.
 - **⌨️ Typora-style shortcuts** — `Ctrl+B` / `Ctrl+I` / `Ctrl+E` / `Ctrl+K` toggle around words, `Enter` continues lists & quotes, `Ctrl+S` saves
-- **📦 Tiny core** — the whole editor is ~40 kB gzipped (excluding language packs), no Electron in sight when running in a browser
+- **📦 Tiny core** — the whole editor is ~40 kB gzipped (excluding language packs & KaTeX), no Electron in sight when running in a browser
 
 ## Quick start
 
@@ -99,8 +103,11 @@ When your caret enters a construct, its decorations lift and the raw syntax show
 
 ## Roadmap
 
+- [x] KaTeX math (`$…$` / `$$…$$`)
+- [x] Styled GFM tables
+- [x] PWA — installable & offline
 - [ ] Workspace: folders, multi-tab, recent files
-- [ ] Math (`$…$` / `$$…$$`) & Mermaid diagrams
+- [ ] Mermaid diagrams
 - [ ] Custom CSS themes & font settings
 - [ ] Footnotes, TOC generation, image file management
 - [ ] Local AI via WebLLM / Ollama

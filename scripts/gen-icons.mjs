@@ -13,6 +13,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "..", "src-tauri", "icons");
+const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), "..", "public", "icons");
 
 /* ---------- tiny PNG encoder ---------- */
 
@@ -169,6 +170,7 @@ mkdirSync(OUT, { recursive: true });
 
 const png32 = encodePNG(render(32), 32, 32);
 const png128 = encodePNG(render(128), 128, 128);
+const png192 = encodePNG(render(192), 192, 192);
 const png256 = encodePNG(render(256), 256, 256);
 const png512 = encodePNG(render(512), 512, 512);
 
@@ -185,5 +187,9 @@ writeFileSync(
   ]),
 );
 writeFileSync(join(OUT, "icon.png"), png512);
+
+mkdirSync(PUBLIC, { recursive: true });
+writeFileSync(join(PUBLIC, "192.png"), png192);
+writeFileSync(join(PUBLIC, "512.png"), png512);
 
 console.log("icons written to", OUT);

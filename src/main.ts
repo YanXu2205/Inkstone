@@ -233,3 +233,8 @@ setDirty(false);
 refreshStatus();
 refreshOutline();
 view.focus();
+
+// PWA: offline app shell (production builds only).
+if (import.meta.env.PROD && "serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js").catch(console.error);
+}

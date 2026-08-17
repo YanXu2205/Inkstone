@@ -199,6 +199,16 @@ body {
   height: 100%;
 }
 
+/* Without a bounded height the scroller grows with its content and the
+   editor never scrolls internally (CM viewport stays one screen tall). */
+#editor .cm-editor {
+  height: 100%;
+}
+
+#editor .cm-scroller {
+  overflow: auto;
+}
+
 /* ---- status bar ---- */
 
 #statusbar {

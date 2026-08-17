@@ -27,6 +27,23 @@ Try it: click into the line below, then click away.
 **Bold**, *italic*, ~~strikethrough~~, \`inline code\`, [a link](https://github.com),
 and emoji 🙂 — all render live.
 
+## 🧮 Math, rendered live by KaTeX
+
+Euler's identity inline — $e^{i\\pi} + 1 = 0$ — and the Gaussian integral:
+
+$$\\int_{-\\infty}^{\\infty} e^{-x^2}\\,dx = \\sqrt{\\pi}$$
+
+Click into a formula to edit its raw TeX; click away and it renders again.
+
+## ⌨️ Shortcuts
+
+| Shortcut       | Action         |
+| -------------- | -------------- |
+| \`Ctrl+B\` / \`Ctrl+I\` | Bold / italic |
+| \`Ctrl+K\`     | Insert link    |
+| \`Ctrl+S\`     | Save           |
+| Ctrl+Backslash | Toggle outline |
+
 ## ✅ Task lists (click the boxes!)
 
 - [x] WYSIWYG editing — no split pane
