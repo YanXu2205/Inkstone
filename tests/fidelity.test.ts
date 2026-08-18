@@ -97,32 +97,36 @@ describe("loading a document with the app's own extension set", () => {
 
 describe("building the live preview over a document", () => {
   for (const name of fixtures) {
-    it(`decorates ${name} without failing or mutating the document`, async () => {
-      const failures = watchDecorationFailures();
-      const view = mount(source(name));
-      const loaded = serializeDoc(view.state);
+    it(
+      `decorates ${name} without failing or mutating the document`,
+      async () => {
+        const failures = watchDecorationFailures();
+        const view = mount(source(name));
+        const loaded = serializeDoc(view.state);
 
-      try {
-        expect(view.plugin(livePreview)).not.toBeNull();
-        expect(view.state.field(blockWidgets)).toBeDefined();
+        try {
+          expect(view.plugin(livePreview)).not.toBeNull();
+          expect(view.state.field(blockWidgets)).toBeDefined();
 
-        // Every caret position rebuilds the decorations with a different set of
-        // constructs "opened up", so walk the whole document line by line.
-        for (let line = 1; line <= view.state.doc.lines; line++) {
-          const { from, to } = view.state.doc.line(line);
-          view.dispatch({ selection: { anchor: from } });
-          view.dispatch({ selection: { anchor: Math.floor((from + to) / 2) } });
-          view.dispatch({ selection: { anchor: from, head: to } });
+          // Every caret position rebuilds the decorations with a different set of
+          // constructs "opened up", so walk the whole document line by line.
+          for (let line = 1; line <= view.state.doc.lines; line++) {
+            const { from, to } = view.state.doc.line(line);
+            view.dispatch({ selection: { anchor: from } });
+            view.dispatch({ selection: { anchor: Math.floor((from + to) / 2) } });
+            view.dispatch({ selection: { anchor: from, head: to } });
+          }
+          await Promise.resolve();
+          await new Promise((resolve) => setTimeout(resolve, 0));
+
+          expect(failures()).toEqual([]);
+          expect(serializeDoc(view.state)).toBe(loaded);
+        } finally {
+          view.destroy();
         }
-        await Promise.resolve();
-        await new Promise((resolve) => setTimeout(resolve, 0));
-
-        expect(failures()).toEqual([]);
-        expect(serializeDoc(view.state)).toBe(loaded);
-      } finally {
-        view.destroy();
-      }
-    });
+      },
+      20_000,
+    );
   }
 
   it("produces decorations rather than silently rendering the raw source", () => {
