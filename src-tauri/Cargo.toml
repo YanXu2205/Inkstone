@@ -1,10 +1,10 @@
 [package]
 name = "inkstone"
-version = "0.1.0"
+version = "0.2.0"
 description = "Free, open-source WYSIWYG Markdown editor"
 authors = ["inkstone contributors"]
 license = "MIT"
-repository = "https://github.com/loserYan/Inkstone"
+repository = "https://github.com/YanXu2205/Inkstone"
 edition = "2021"
 
 # The _lib suffix avoids collision with the binary on Windows.
