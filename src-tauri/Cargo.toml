@@ -1,6 +1,6 @@
 [package]
 name = "inkstone"
-version = "0.3.0"
+version = "0.3.1"
 description = "Free, open-source WYSIWYG Markdown editor"
 authors = ["inkstone contributors"]
 license = "AGPL-3.0-or-later"

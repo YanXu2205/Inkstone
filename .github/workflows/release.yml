@@ -8,8 +8,8 @@ on:
 permissions:
   contents: write
 
-# Signing is optional. See docs/SIGNING.md.
-# When the secrets below are absent, installers still build and upload unsigned.
+# Signing is optional — see docs/SIGNING.md.
+# Empty secrets must NOT be exported (tauri treats them as "sign with bad cert").
 
 jobs:
   build-desktop:
@@ -57,34 +57,46 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
-      - name: Import Windows certificate
-        if: matrix.os == 'windows-latest' && env.WINDOWS_CERTIFICATE != ''
+      # Only export signing vars when the secret has a real value.
+      - name: Configure optional code signing
+        shell: bash
         env:
-          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
-          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
-        shell: pwsh
+          S_WIN_CERT: ${{ secrets.WINDOWS_CERTIFICATE }}
+          S_WIN_PASS: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+          S_APPLE_CERT: ${{ secrets.APPLE_CERTIFICATE }}
+          S_APPLE_PASS: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          S_APPLE_IDTY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          S_APPLE_ID: ${{ secrets.APPLE_ID }}
+          S_APPLE_PW: ${{ secrets.APPLE_PASSWORD }}
+          S_APPLE_TEAM: ${{ secrets.APPLE_TEAM_ID }}
+          S_TAURI_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          S_TAURI_KPW: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         run: |
-          $bytes = [Convert]::FromBase64String($env:WINDOWS_CERTIFICATE)
-          [IO.File]::WriteAllBytes("$env:RUNNER_TEMP/cert.pfx", $bytes)
-          echo "WINDOWS_CERTIFICATE_PATH=$env:RUNNER_TEMP/cert.pfx" >> $env:GITHUB_ENV
+          set_if() { # name value
+            if [ -n "$2" ]; then
+              echo "$1<<EOF" >> "$GITHUB_ENV"
+              echo "$2" >> "$GITHUB_ENV"
+              echo "EOF" >> "$GITHUB_ENV"
+              echo "signing: set $1"
+            else
+              echo "signing: skip $1 (empty)"
+            fi
+          }
+          set_if WINDOWS_CERTIFICATE "$S_WIN_CERT"
+          set_if WINDOWS_CERTIFICATE_PASSWORD "$S_WIN_PASS"
+          set_if APPLE_CERTIFICATE "$S_APPLE_CERT"
+          set_if APPLE_CERTIFICATE_PASSWORD "$S_APPLE_PASS"
+          set_if APPLE_SIGNING_IDENTITY "$S_APPLE_IDTY"
+          set_if APPLE_ID "$S_APPLE_ID"
+          set_if APPLE_PASSWORD "$S_APPLE_PW"
+          set_if APPLE_TEAM_ID "$S_APPLE_TEAM"
+          set_if TAURI_SIGNING_PRIVATE_KEY "$S_TAURI_KEY"
+          set_if TAURI_SIGNING_PRIVATE_KEY_PASSWORD "$S_TAURI_KPW"
 
       - name: Build and attach to GitHub Release
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Windows Authenticode (optional)
-          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
-          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
-          # Apple signing + notarization (optional)
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          # Tauri updater signatures (optional)
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: "Inkstone ${{ github.ref_name }}"
@@ -92,17 +104,14 @@ jobs:
             Desktop builds of Inkstone for this tag.
 
             ## Downloads
-            Pick the installer for your OS from the assets below:
             - **Windows** — `.msi` / `.exe`
             - **macOS** — `.dmg` (Apple Silicon and Intel)
-            - **Linux** — `.AppImage` / `.deb`
+            - **Linux** — `.AppImage` / `.deb` / `.rpm`
 
-            Installers may be **unsigned** unless repository signing secrets
-            are configured (see `docs/SIGNING.md`). Windows SmartScreen /
-            macOS Gatekeeper warnings are expected in that case.
+            Installers are **unsigned** unless you configured secrets
+            (see `docs/SIGNING.md`). SmartScreen / Gatekeeper warnings are normal.
 
             ## Web
-            Or run from source:
             ```bash
             git clone https://github.com/YanXu2205/Inkstone.git
             cd Inkstone && npm install && npm run dev
