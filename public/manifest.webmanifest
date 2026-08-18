@@ -1,6 +1,6 @@
 {
-  "name": "OpenTypora",
-  "short_name": "OpenTypora",
+  "name": "Inkstone",
+  "short_name": "Inkstone",
   "description": "Free, open-source, local-first WYSIWYG Markdown editor — the community successor to Typora & MarkText.",
   "start_url": "./",
   "scope": "./",

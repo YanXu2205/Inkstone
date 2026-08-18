@@ -1,9 +1,9 @@
 /**
- * OpenTypora service worker — cache-first for the app shell so the
+ * Inkstone service worker — cache-first for the app shell so the
  * editor keeps working offline. Documents themselves live on the
  * user's disk / in localStorage, never here.
  */
-const CACHE = "opentypora-v1";
+const CACHE = "inkstone-v1";
 const CORE = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
 
 self.addEventListener("install", (e) => {

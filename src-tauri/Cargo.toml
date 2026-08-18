@@ -1,15 +1,15 @@
 [package]
-name = "opentypora"
+name = "inkstone"
 version = "0.1.0"
 description = "Free, open-source WYSIWYG Markdown editor"
-authors = ["open-typora contributors"]
+authors = ["inkstone contributors"]
 license = "MIT"
-repository = "https://github.com/open-typora/open-typora"
+repository = "https://github.com/loserYan/Inkstone"
 edition = "2021"
 
 # The _lib suffix avoids collision with the binary on Windows.
 [lib]
-name = "opentypora_lib"
+name = "inkstone_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

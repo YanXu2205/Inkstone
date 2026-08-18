@@ -1,12 +1,12 @@
-# Contributing to OpenTypora
+# Contributing to Inkstone
 
 Thanks for helping build the successor Typora deserves! 🎉
 
 ## Getting started
 
 ```bash
-git clone https://github.com/open-typora/open-typora
-cd open-typora
+git clone https://github.com/loserYan/Inkstone
+cd Inkstone
 npm install
 npm run dev      # http://localhost:1420
 ```

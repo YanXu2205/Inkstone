@@ -1,12 +1,12 @@
 {
-  "name": "open-typora",
+  "name": "inkstone",
   "version": "0.2.0",
   "description": "A free, open-source, local-first WYSIWYG Markdown editor. The community successor to Typora & MarkText.",
   "type": "module",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/open-typora/open-typora"
+    "url": "https://github.com/loserYan/Inkstone"
   },
   "keywords": [
     "markdown",

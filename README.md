@@ -1,14 +1,14 @@
 <div align="center">
 
-<img src="public/icon.svg" width="96" alt="OpenTypora logo" />
+<img src="public/icon.svg" width="96" alt="Inkstone logo" />
 
-# OpenTypora
+# Inkstone
 
 **The free, open-source, local-first WYSIWYG Markdown editor.**
 The community successor to [Typora](https://typora.io) & [MarkText](https://github.com/marktext/marktext).
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-6366f1.svg)](LICENSE)
-[![CI](https://github.com/open-typora/open-typora/actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
+[![CI](https://github.com/loserYan/Inkstone/actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 *English · [简体中文](README.zh-CN.md)*
@@ -17,7 +17,7 @@ The community successor to [Typora](https://typora.io) & [MarkText](https://gith
 
 ---
 
-![OpenTypora in light mode](docs/screenshot-light.png)
+![Inkstone in light mode](docs/screenshot-light.png)
 
 Move your caret anywhere and the raw Markdown appears **in place** — move away and it melts back into beautiful prose. No split pane, no preview window, no toggle. Just you and the text.
 
@@ -35,9 +35,9 @@ Move your caret anywhere and the raw Markdown appears **in place** — move away
 
 ## Why
 
-Typora is lovely but **paid and closed-source**. MarkText was the beloved free alternative — **unmaintained since 2022** with 53k+ stars worth of users still looking for a home. OpenTypora takes the baton:
+Typora is lovely but **paid and closed-source**. MarkText was the beloved free alternative — **unmaintained since 2022** with 53k+ stars worth of users still looking for a home. Inkstone takes the baton:
 
-|                    | Typora        | MarkText        | **OpenTypora**     |
+|                    | Typora        | MarkText        | **Inkstone**     |
 | ------------------ | ------------- | --------------- | ------------------ |
 | Seamless WYSIWYG   | ✅            | ✅              | ✅                 |
 | Math & tables      | ✅            | ✅              | ✅                 |
@@ -77,8 +77,8 @@ Typora is lovely but **paid and closed-source**. MarkText was the beloved free a
 ### In your browser (zero install)
 
 ```bash
-git clone https://github.com/open-typora/open-typora
-cd open-typora
+git clone https://github.com/loserYan/Inkstone
+cd Inkstone
 npm install
 npm run dev          # → http://localhost:1420
 ```
@@ -143,10 +143,10 @@ Issues and PRs are very welcome — this project exists because its predecessors
 
 ## Acknowledgments
 
-- [Typora](https://typora.io) for defining what a Markdown editor should feel like (OpenTypora is an independent project, not affiliated with or endorsed by Typora)
+- [Typora](https://typora.io) for defining what a Markdown editor should feel like (Inkstone is an independent project, not affiliated with or endorsed by Typora)
 - [MarkText](https://github.com/marktext/marktext) for years of free excellence
 - [CodeMirror 6](https://codemirror.net) — the editor kernel that makes this architecture possible
 
 ## License
 
-[MIT](LICENSE) © open-typora contributors
+[MIT](LICENSE) © inkstone contributors

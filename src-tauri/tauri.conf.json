@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "OpenTypora",
+  "productName": "Inkstone",
   "version": "0.2.0",
-  "identifier": "app.opentypora.desktop",
+  "identifier": "app.inkstone.desktop",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "OpenTypora",
+        "title": "Inkstone",
         "width": 1200,
         "height": 800,
         "minWidth": 640,
@@ -37,6 +37,6 @@
     ],
     "category": "Productivity",
     "shortDescription": "Free, open-source WYSIWYG Markdown editor",
-    "longDescription": "OpenTypora is a free, open-source, local-first WYSIWYG Markdown editor — the community successor to Typora and MarkText."
+    "longDescription": "Inkstone is a free, open-source, local-first WYSIWYG Markdown editor — the community successor to Typora and MarkText."
   }
 }

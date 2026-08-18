@@ -3,7 +3,7 @@ import { t } from "./i18n";
 
 /**
  * Bring-your-own-key AI assistance. Everything stays between the user
- * and their chosen OpenAI-compatible endpoint — OpenTypora ships no
+ * and their chosen OpenAI-compatible endpoint — Inkstone ships no
  * cloud, no accounts, no telemetry.
  */
 

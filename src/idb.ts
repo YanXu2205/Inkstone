@@ -4,7 +4,7 @@
  * reopen files across sessions with one permission click).
  */
 
-const DB_NAME = "opentypora";
+const DB_NAME = "inkstone";
 const STORE = "recents";
 const KV = "kv";
 

@@ -15,7 +15,7 @@ export const MERMAID_DEMO_MD = `# Mermaid demo
 graph LR
   M[One Markdown buffer] --> L{Live preview}
   L -->|Typora| P[Paid & closed]
-  L -->|OpenTypora| F[Free & open]
+  L -->|Inkstone| F[Free & open]
 \`\`\`
 
 \`\`\`mermaid
@@ -28,7 +28,7 @@ flowchart TD
 \`\`\`
 `;
 
-export const WELCOME_MD = `# Welcome to OpenTypora 👋
+export const WELCOME_MD = `# Welcome to Inkstone 👋
 
 [toc]
 
@@ -87,18 +87,18 @@ const view = new EditorView({ doc: markdown, extensions: [livePreview] });
 graph LR
   M[One Markdown buffer] --> L{Live preview}
   L -->|Typora| P[Paid & closed]
-  L -->|OpenTypora| F[Free & open]
+  L -->|Inkstone| F[Free & open]
 \`\`\`
 
 ## 🖼 Images render inline
 
-![OpenTypora](${ICON})
+![Inkstone](${ICON})
 
 Paste an image from your clipboard — it embeds instantly, fully offline.
 
 ## 📋 Tables
 
-| Feature        | Typora | MarkText | OpenTypora |
+| Feature        | Typora | MarkText | Inkstone |
 | -------------- | :----: | :------: | :--------: |
 | WYSIWYG        |   ✅   |    ✅    |     ✅     |
 | Price          |  paid  |  free*   |   free     |

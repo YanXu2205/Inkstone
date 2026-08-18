@@ -279,7 +279,7 @@ export function toLatex(md: MarkdownIt, title: string, src: string): string {
 \\usepackage{hyperref}
 \\usepackage[normalem]{ulem}
 \\title{${texEscape(title)}}
-\\author{OpenTypora}
+\\author{Inkstone}
 \\date{\\today}
 \\begin{document}
 \\maketitle
@@ -370,7 +370,7 @@ img { max-width: 100%; }`,
     <dc:identifier id="book-id">${uuid}</dc:identifier>
     <dc:title>${escapeXml(title)}</dc:title>
     <dc:language>en</dc:language>
-    <dc:creator>OpenTypora export</dc:creator>
+    <dc:creator>Inkstone export</dc:creator>
     <meta property="dcterms:modified">${modified}</meta>
   </metadata>
   <manifest>

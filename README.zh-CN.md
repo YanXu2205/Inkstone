@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="public/icon.svg" width="96" alt="OpenTypora logo" />
+<img src="public/icon.svg" width="96" alt="Inkstone logo" />
 
-# OpenTypora 中文文档
+# Inkstone 中文文档
 
 **免费、开源、本地优先的所见即所得 Markdown 编辑器。**
 [Typora](https://typora.io) 与 [MarkText](https://github.com/marktext/marktext) 的社区继任者。
@@ -15,7 +15,7 @@
 
 ---
 
-![OpenTypora 浅色主题](docs/screenshot-light.png)
+![Inkstone 浅色主题](docs/screenshot-light.png)
 
 <details>
 <summary><b>更多截图</b>（深色主题 · Mermaid · 简体中文界面）</summary>
@@ -30,9 +30,9 @@
 
 ## 为什么做这个项目
 
-Typora 很优秀，但**收费且闭源**；MarkText 是最受欢迎的免费替代品，却**自 2022 年起停止维护**，5 万多星的用户一直在寻找新家。OpenTypora 接过接力棒：
+Typora 很优秀，但**收费且闭源**；MarkText 是最受欢迎的免费替代品，却**自 2022 年起停止维护**，5 万多星的用户一直在寻找新家。Inkstone 接过接力棒：
 
-|                    | Typora        | MarkText        | **OpenTypora**     |
+|                    | Typora        | MarkText        | **Inkstone**     |
 | ------------------ | ------------- | --------------- | ------------------ |
 | 无缝所见即所得     | ✅            | ✅              | ✅                 |
 | 数学公式与表格     | ✅            | ✅              | ✅                 |
@@ -70,8 +70,8 @@ Typora 很优秀，但**收费且闭源**；MarkText 是最受欢迎的免费替
 ## 快速开始
 
 ```bash
-git clone https://github.com/open-typora/open-typora
-cd open-typora
+git clone https://github.com/loserYan/Inkstone
+cd Inkstone
 npm install
 npm run dev          # → http://localhost:1420
 ```
@@ -120,4 +120,4 @@ Windows / macOS / Linux 预编译包由 CI 发布在 [Releases](../../releases)�
 
 ## 许可
 
-[MIT](LICENSE) © open-typora contributors
+[MIT](LICENSE) © inkstone contributors

@@ -120,14 +120,14 @@ function standaloneHTML(title: string, src: string): string {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="generator" content="OpenTypora">
+<meta name="generator" content="Inkstone">
 <title>${escapeHTML(title)}</title>
 <style>${EXPORT_CSS}</style>
 </head>
 <body>
 ${renderMarkdown(src)}
 <p class="ot-export-note" style="margin-top:4em;font-size:11px;color:#8b949e">
-  Exported from OpenTypora — the free, open-source WYSIWYG Markdown editor.
+  Exported from Inkstone — the free, open-source WYSIWYG Markdown editor.
 </p>
 </body>
 </html>`;

@@ -21,7 +21,7 @@ import { mathBody } from "./math";
 import { extractHeadings } from "../outline";
 
 /**
- * The heart of OpenTypora: a Typora-style "seamless live preview".
+ * The heart of Inkstone: a Typora-style "seamless live preview".
  *
  * The document always IS markdown — there is no second rendering
  * surface. Instead we walk the lezer syntax tree and decorate the
