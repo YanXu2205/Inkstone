@@ -1,6 +1,6 @@
 {
   "name": "inkstone",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A free, open-source, local-first WYSIWYG Markdown editor inspired by Typora.",
   "type": "module",
   "license": "AGPL-3.0-or-later",
