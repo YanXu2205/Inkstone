@@ -2,10 +2,10 @@
 
 <img src="public/icon.svg" width="96" alt="Inkstone logo" />
 
-# Inkstone 中文文档
+# Inkstone · 砚
 
-**免费、开源、本地优先的所见即所得 Markdown 编辑器。**
-[Typora](https://typora.io) 与 [MarkText](https://github.com/marktext/marktext) 的社区继任者。
+**免费、开源、本地优先的所见即所得 Markdown 编辑器。**  
+受 [Typora](https://typora.io) 启发 —— 与 Typora 无任何隶属关系。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-6366f1.svg)](LICENSE)
 
@@ -15,109 +15,87 @@
 
 ---
 
-![Inkstone 浅色主题](docs/screenshot-light.png)
+![浅色主题](docs/screenshot-light.png)
 
-<details>
-<summary><b>更多截图</b>（深色主题 · Mermaid · 简体中文界面）</summary>
+在同一个编辑区写 Markdown：光标离开后，语法标记隐藏，看起来像排好版的文档。
+没有左右分栏预览。
 
-![深色主题](docs/screenshot-dark.png)
-![Mermaid 图表](docs/screenshot-mermaid.png)
-![简体中文界面](docs/screenshot-zh.png)
+## 它是什么
 
-</details>
+Inkstone 是面向 **`.md` 单文件写作** 的编辑器：
 
-光标移到哪里，哪里的原始 Markdown 语法就**原地显现**；移开，它又化回漂亮的正文。没有分栏、没有预览窗口、没有开关——只有你和文字。
+- 缓冲区里就是 Markdown 源码（CodeMirror 6）。实时预览靠装饰和 widget，
+  **不是**另渲染一份 HTML 再在保存时整篇重写。
+- 可在 **浏览器** 里跑（Vite，可选 PWA），也有可选的 **Tauri 2** 桌面壳。
+- **无账号、无云同步、无遥测。** 文件在你磁盘上（或浏览器授权的文件句柄里）。
 
-## 为什么做这个项目
+它 **不是** 知识库：不做双链、图谱、官方同步。那些需求请用 Obsidian 等。
 
-Typora 很优秀，但**收费且闭源**；MarkText 是最受欢迎的免费替代品，却**自 2022 年起停止维护**，5 万多星的用户一直在寻找新家。Inkstone 接过接力棒：
+## 当前已实现的功能
 
-|                    | Typora        | MarkText        | **Inkstone**     |
-| ------------------ | ------------- | --------------- | ------------------ |
-| 无缝所见即所得     | ✅            | ✅              | ✅                 |
-| 数学公式与表格     | ✅            | ✅              | ✅                 |
-| 价格               | 收费          | 免费            | **免费，永远**      |
-| 源代码             | 闭源          | 开源（休眠）    | **开源，活跃**      |
-| 本地优先           | ✅            | ✅              | ✅                 |
-| 可在浏览器运行     | ❌            | ❌              | ✅（PWA）          |
-| 自带 Key 的 AI     | ❌            | ❌              | ✅                 |
-| 遥测               | —             | 无              | **无**              |
+- 实时预览：标题、强调、链接、图片、任务列表、分隔线
+- GFM 表格（对齐、编辑前隐藏分隔行）
+- KaTeX：`$…$` / `$$…$$`
+- Mermaid 代码块（按需加载）
+- `==高亮==`、脚注、`[toc]`
+- 多标签；最近文件；文件夹工作区（File System Access API）
+- 粘贴图片：有工作区时写入 `assets/`，否则 data URL
+- 五套主题 + 跟随系统；打字机模式；大纲
+- 字体 / 字号 / 栏宽 / 自定义 CSS
+- 导出：HTML、Word（`.doc`）、LaTeX、ePub 3、打印/PDF
+- 界面：English / 简体中文 / 日本語
+- 可选 AI（见下）
 
-## 功能
+## 可选 AI（自带 Key）
 
-- **🖱 真正的无缝实时预览** —— 标题、强调、链接、图片、任务列表、分隔线随打字渲染，语法只在光标处显现
-- **🧮 KaTeX 数学公式** —— `$…$` 行内与 `$$…$$` 块级公式实时渲染（自研 Lezer 内联解析器）
-- **🧜 Mermaid 图表** —— ` ```mermaid ` 代码块渲染为流程图/关系图，随主题自动换色
-- **📋 GFM 表格真渲染** —— 表头加粗、按分隔行对齐、`|---|` 分隔行编辑前隐藏
-- **🗂 多标签工作区** —— 每个标签独立保留撤销历史、光标与视口；最近文件一键重开（句柄存 IndexedDB）
-- **📂 文件夹工作区** —— 把目录打开为侧栏文件树，浏览、新建文件、点开成标签；跨会话记忆
-- **⚙ 编辑偏好** —— 正文字体、字号、栏宽，以及 Typora 式的**自定义 CSS** 全局覆写
-- **🖍 `==高亮==`** 与 **[^脚注]** —— 引用芯片点击跳转到定义
-- **🖼 内联图片** —— 剪贴板直接粘贴；连接文件夹工作区时自动存入 `assets/` 并以相对路径引用（Typora 式），否则离线内嵌 data URL
-- **📑 自动目录** —— 单独一行写 `[toc]`，得到跟随标题实时更新的可点击目录盒
-- **✅ 可交互复选框** —— 点击即切换 `- [ ]` / `- [x]`
-- **📦 语法高亮代码块** + 语言标签（100+ 语言）
-- **🌓 五套主题** —— 浅色、深色、Solarized、Nord、Dracula，外加跟随系统
-- **⌨️ 打字机模式** 与点击跳转的文档大纲（`Ctrl+\`）
-- **💾 真实文件读写** —— 打开 / 保存 / 另存 `.md`；Chrome、Edge 与桌面端支持原位保存
-- **📄 导出** —— 自包含 HTML、**Word (.doc)**、**LaTeX (.tex)**、**ePub 3 电子书**（含可导航目录）、打印为 PDF，全部离线完成
-- **📲 可安装 PWA** —— 完全离线可用，像原生应用一样从浏览器安装
-- **✨ AI 助手（可选）** —— 润色、中英互译、总结，使用*你自己的* OpenAI 兼容 API Key，**内置本地 Ollama / LM Studio 一键预设**。除你选中的文字外无任何数据离开你的机器
-- **🌍 界面多语言** —— English / 简体中文 / 日本語，自动检测、可切换；新增语言只需加一个对象
-- **⌨️ Typora 风格快捷键** —— `Ctrl+B` / `Ctrl+I` / `Ctrl+E` / `Ctrl+K` 对当前词智能包裹，`Enter` 自动延续列表与引用，`Ctrl+S` 保存
-- **📦 极小核心** —— 编辑器核心 gzip 后约 40 kB（不含语言包与 KaTeX），浏览器中运行无需 Electron
+设置 → AI。填入 OpenAI 兼容接口与 Key（内置 Ollama / LM Studio 等本机预设）。
+
+目前动作：**润色**、**翻译**、**摘要**。
+
+**请先知道的限制：**
+
+- Key 存在 **当前浏览器的 `localStorage`**，不是系统钥匙串。
+- 没有选中文本时，可能 **发送全文**，返回结果可能 **直接替换整篇**（可用 Ctrl+Z 撤销）。建议先选中再操作。
+- 本版本 **没有** 逐条 diff 确认，也 **没有** 敏感信息扫描。
+- 只有你主动点 AI 动作才会联网；Inkstone 没有自建云端。
 
 ## 快速开始
 
 ```bash
-git clone https://github.com/loserYan/Inkstone
+git clone https://github.com/YanXu2205/Inkstone.git
 cd Inkstone
 npm install
-npm run dev          # → http://localhost:1420
+npm run dev          # http://localhost:1420
 ```
 
-桌面版（Tauri 2）：
+Chrome / Edge 可原位保存；Firefox / Safari 为下载/上传回退。
+
+### 桌面端（可选）
+
+需要 [Rust](https://rustup.rs) 与 Tauri CLI：
 
 ```bash
 npm run build
 cd src-tauri && cargo tauri build
 ```
 
-Windows / macOS / Linux 预编译包由 CI 发布在 [Releases](../../releases)。源码构建需要 [Rust](https://rustup.rs)。
+### 检查
 
-## 实现原理
+```bash
+npm run check
+npm test             # LaTeX / ePub 导出冒烟测试
+npm run build
+```
 
-**没有第二个渲染层。** 文档永远只是一个 CodeMirror 6 缓冲区；装饰插件遍历 Lezer 语法树：
+## 技术栈
 
-- 光标不在节点内时，用 `Decoration.replace` 折叠语法标记（`#`、`**`、`` ` ``、`>`、`](…)`）；
-- 用行装饰为块级元素（标题、引用、代码围栏）上样式；
-- 将图片、任务复选框、分隔线替换为交互式 widget。
+CodeMirror 6、KaTeX、Mermaid、markdown-it、Tauri 2（可选）。许可证：**MIT**。
 
-光标进入某个结构时，其装饰自动让位，原始语法透出——这就是全部诀窍。因为缓冲区*就是*唯一事实来源，复制粘贴、搜索、撤销、无障碍访问 100% 不受影响。详见 [`src/editor/livePreview.ts`](src/editor/livePreview.ts)。
+## 商标
 
-## 路线图
-
-- [x] KaTeX 数学公式（`$…$` / `$$…$$`）
-- [x] GFM 表格真渲染
-- [x] Mermaid 图表
-- [x] 多标签工作区与最近文件
-- [x] 文件夹工作区（文件树）
-- [x] `==高亮==` 与脚注
-- [x] 编辑偏好 + 自定义 CSS
-- [x] 五套内置主题 + 打字机模式
-- [x] PWA —— 可安装、离线可用
-- [x] 图片落盘到工作区 assets/（相对路径引用）
-- [x] [toc] 自动目录
-- [x] 导出 Word / LaTeX / ePub
-- [x] 离线单元测试（npm test）
-- [ ] 完整主题库 / 可导入主题
-- [ ] 浏览器内本地 AI（WebLLM）
-- [x] 界面国际化（English / 简体中文 / 日本語）
-
-## 参与贡献
-
-欢迎 Issue 与 PR——这个项目的存在，正是因为前辈们停下了脚步。
+「Typora」为其权利人商标。Inkstone 为独立项目，与 Typora 无关联、无背书。
+「受 Typora 启发」仅为描述性用语。
 
 ## 许可
 
-[MIT](LICENSE) © inkstone contributors
+[MIT](LICENSE) © Inkstone contributors

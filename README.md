@@ -2,13 +2,12 @@
 
 <img src="public/icon.svg" width="96" alt="Inkstone logo" />
 
-# Inkstone
+# Inkstone · 砚
 
-**The free, open-source, local-first WYSIWYG Markdown editor.**
-The community successor to [Typora](https://typora.io) & [MarkText](https://github.com/marktext/marktext).
+**A free, open-source, local-first WYSIWYG Markdown editor.**  
+Inspired by [Typora](https://typora.io) — not affiliated with it.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-6366f1.svg)](LICENSE)
-[![CI](https://github.com/loserYan/Inkstone/actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 *English · [简体中文](README.zh-CN.md)*
@@ -19,134 +18,116 @@ The community successor to [Typora](https://typora.io) & [MarkText](https://gith
 
 ![Inkstone in light mode](docs/screenshot-light.png)
 
-Move your caret anywhere and the raw Markdown appears **in place** — move away and it melts back into beautiful prose. No split pane, no preview window, no toggle. Just you and the text.
+Type Markdown in one pane. When the caret leaves a construct, markers hide and
+the text looks like the finished document. No split preview.
 
-![Caret reveals the raw syntax, just like Typora](docs/screenshot-caret.png)
+![Caret reveals the raw syntax](docs/screenshot-caret.png)
 
 <details>
-<summary><b>More screenshots</b> (dark theme · Dracula · Mermaid · 简体中文)</summary>
+<summary><b>More screenshots</b></summary>
 
 ![Dark theme](docs/screenshot-dark.png)
 ![Dracula theme](docs/screenshot-dracula.png)
-![Mermaid diagrams](docs/screenshot-mermaid.png)
-![简体中文界面](docs/screenshot-zh.png)
+![Mermaid](docs/screenshot-mermaid.png)
+![简体中文](docs/screenshot-zh.png)
 
 </details>
 
-## Why
+## What it is
 
-Typora is lovely but **paid and closed-source**. MarkText was the beloved free alternative — **unmaintained since 2022** with 53k+ stars worth of users still looking for a home. Inkstone takes the baton:
+Inkstone is a **single-document writing app** for `.md` files:
 
-|                    | Typora        | MarkText        | **Inkstone**     |
-| ------------------ | ------------- | --------------- | ------------------ |
-| Seamless WYSIWYG   | ✅            | ✅              | ✅                 |
-| Math & tables      | ✅            | ✅              | ✅                 |
-| Price              | paid          | free            | **free, forever**  |
-| Source             | closed        | open (dormant)  | **open, active**   |
-| Local-first        | ✅            | ✅              | ✅                 |
-| Runs in a browser  | ❌            | ❌              | ✅ (PWA)           |
-| Bring-your-own-key AI | ❌         | ❌              | ✅                 |
-| Telemetry          | —             | none            | **none**           |
+- The buffer **is** the Markdown source (CodeMirror 6). Live preview is
+  decorations and widgets — not a second HTML document that gets re-exported
+  on save.
+- Runs in the **browser** (Vite + optional PWA) and has an optional **Tauri 2**
+  desktop shell.
+- **No account, no cloud sync, no telemetry.** Files stay on your disk (or in
+  the browser’s sandboxed file handles).
 
-## Features
+It is **not** a knowledge base (no bi-directional links, graph, or sync
+service). If you need that, use Obsidian / Logseq / etc.
 
-- **🖱 True seamless live preview** — headings, emphasis, links, images, task lists and rules render as you type; syntax appears only where your caret is
-- **🧮 KaTeX math** — `$…$` inline and `$$…$$` display formulas, rendered live via a custom Lezer inline parser
-- **🧜 Mermaid diagrams** — ` ```mermaid ` blocks render as flowcharts & graphs, re-theming with the app
-- **📋 Styled GFM tables** — real headers, column alignment from the delimiter row, and the raw `|---|` separator hidden until you edit
-- **🗂 Multi-tab workspace** — every tab keeps its own undo history, cursor & viewport; recent files reopen with one click (handles persisted in IndexedDB)
-- **📂 Folder workspace** — open a directory as a file tree in the sidebar, browse, create files and open them as tabs; persisted across sessions
-- **⚙ Editor preferences** — content font, size, column width, and a Typora-style **custom CSS** override for everything else
-- **🖍 `==highlight==`** and **[^footnotes]** — chips jump to their definition
-- **🖼 Inline images** — paste from clipboard; inside a folder workspace they are saved to `assets/` and referenced by relative path (Typora-style), otherwise embedded offline as data URLs
-- **📑 Auto table of contents** — write `[toc]` on a line and get a live, clickable contents box that follows your headings
-- **✅ Interactive checkboxes** — click to toggle `- [ ]` / `- [x]`
-- **📦 Syntax-highlighted code blocks** with a clean language chip (100+ languages)
-- **🌓 Five themes** — Light, Dark, Solarized, Nord & Dracula, plus auto (system)
-- **⌨️ Typewriter mode** & document outline with click-to-jump (`Ctrl+\`)
-- **💾 Real file handling** — open / save / save-as `.md`; in-place saving on Chrome, Edge & the desktop app
-- **📄 Export** — self-contained HTML, **Word (.doc)**, **LaTeX (.tex)**, **ePub 3 (.epub)** with a navigable table of contents, or Print → PDF — all offline
-- **📲 Installable PWA** — works fully offline; install it from the browser like a native app
-- **✨ AI assist (optional)** — polish, translate (EN ⇄ 中文), summarize — with *your own* OpenAI-compatible API key, **including one-click presets for local Ollama & LM Studio**. Nothing leaves your machine except the text you choose.
-- **🌍 i18n** — UI in English, 简体中文 & 日本語 (auto-detected, switchable; adding a language is one object)
-- **⌨️ Typora-style shortcuts** — `Ctrl+B` / `Ctrl+I` / `Ctrl+E` / `Ctrl+K` toggle around words, `Enter` continues lists & quotes, `Ctrl+S` saves
-- **📦 Tiny core** — the whole editor is ~40 kB gzipped (excluding language packs & KaTeX), no Electron in sight when running in a browser
+## Features (what actually ships today)
+
+- Live preview: headings, emphasis, links, images, task lists, horizontal rules
+- GFM tables (alignment from the delimiter row; separator hidden until edited)
+- KaTeX math: `$…$` and `$$…$$`
+- Mermaid fenced blocks (loaded on demand)
+- `==highlight==`, footnotes, `[toc]`
+- Multi-tab editing; recent files; folder workspace (File System Access API)
+- Paste image → `assets/` when a folder is open, otherwise data URL
+- Five themes + system; typewriter mode; outline sidebar
+- Editor prefs: font, size, column width, custom CSS
+- Export: HTML, Word (`.doc`), LaTeX, ePub 3, print/PDF
+- UI languages: English, 简体中文, 日本語
+- Optional AI (see below)
+
+## Optional AI (bring your own key)
+
+Settings → AI. You provide an OpenAI-compatible endpoint and key (presets
+include Ollama / LM Studio on localhost).
+
+Current actions: **polish**, **translate**, **summarize**.
+
+**Honest limits (read before enabling):**
+
+- The key is stored in **this browser’s `localStorage`** (not an OS keychain).
+- With no selection, the **whole document** may be sent and the reply can
+  **replace the buffer** (undo with Ctrl+Z). Prefer selecting a range first.
+- There is no built-in “diff review” or secret scanner in this release.
+- Nothing is sent until you run an action; the app has no Inkstone cloud.
 
 ## Quick start
 
-### In your browser (zero install)
-
 ```bash
-git clone https://github.com/loserYan/Inkstone
+git clone https://github.com/YanXu2205/Inkstone.git
 cd Inkstone
 npm install
-npm run dev          # → http://localhost:1420
+npm run dev          # http://localhost:1420
 ```
 
-Chrome / Edge get full in-place file saving via the File System Access API.
+Chrome / Edge: in-place save via the File System Access API.  
+Firefox / Safari: download / upload fallback.
 
-### Desktop app (Tauri 2)
+### Desktop (optional)
+
+Needs [Rust](https://rustup.rs) and Tauri CLI:
 
 ```bash
-npm run build         # web assets
+npm run build
 cd src-tauri && cargo tauri build
 ```
 
-Prebuilt binaries for Windows, macOS and Linux are published on the [releases page](../../releases) by CI. Requires [Rust](https://rustup.rs) to build from source.
+### Checks
 
-## Keyboard shortcuts
+```bash
+npm run check        # TypeScript
+npm test             # export smoke tests (LaTeX / ePub)
+npm run build
+```
 
-| Shortcut      | Action                  |
-| ------------- | ----------------------- |
-| `Ctrl+O`      | Open a Markdown file    |
-| `Ctrl+S`      | Save / save as          |
-| `Ctrl+B`      | Bold (toggle)           |
-| `Ctrl+I`      | Italic (toggle)         |
-| `Ctrl+E`      | Inline code (toggle)    |
-| `Ctrl+Shift+X`| Strikethrough (toggle)  |
-| `Ctrl+K`      | Insert link             |
-| `Ctrl+\`      | Toggle outline          |
-| `Ctrl+F`      | Search                  |
+## Stack
 
-## How it works
-
-There is **no second rendering surface**. The document is always one CodeMirror 6 buffer; a decoration plugin walks the Lezer syntax tree and
-
-- collapses syntax markers (`#`, `**`, `` ` ``, `>`, `](…)`) with `Decoration.replace` whenever the caret is outside their node,
-- styles blocks (headings, quotes, code fences) with line decorations,
-- swaps images, task checkboxes and rules for live widgets.
-
-When your caret enters a construct, its decorations lift and the raw syntax shows through — that's the whole trick, and it keeps copy/paste, search, undo and accessibility 100% intact because the buffer *is* the source of truth. See [`src/editor/livePreview.ts`](src/editor/livePreview.ts).
-
-## Roadmap
-
-- [x] KaTeX math (`$…$` / `$$…$$`)
-- [x] Styled GFM tables
-- [x] Mermaid diagrams
-- [x] Multi-tab workspace & recent files
-- [x] Folder workspace (file tree)
-- [x] `==highlight==` & footnotes
-- [x] Five built-in themes + typewriter mode
-- [x] Editor preferences + custom CSS
-- [x] PWA — installable & offline
-- [x] Image assets saved to workspace `assets/` with relative paths
-- [x] `[toc]` auto table of contents
-- [x] Export to Word / LaTeX / ePub
-- [x] Offline unit tests (`npm test`)
-- [ ] Full theme gallery / importable themes
-- [ ] Local AI via WebLLM (in-browser weights)
-- [x] i18n UI (en / zh-CN / ja)
+| Layer | Choice |
+| --- | --- |
+| Editor | CodeMirror 6 + Lezer Markdown |
+| Math / diagrams | KaTeX, Mermaid |
+| Export | markdown-it, JSZip (ePub) |
+| Desktop | Tauri 2 (dialogs + fs) |
+| License | MIT |
 
 ## Contributing
 
-Issues and PRs are very welcome — this project exists because its predecessors stopped. See [CONTRIBUTING.md](CONTRIBUTING.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md). Keep the editor local-first; don’t add
+telemetry or a required network backend.
 
-## Acknowledgments
+## Trademark
 
-- [Typora](https://typora.io) for defining what a Markdown editor should feel like (Inkstone is an independent project, not affiliated with or endorsed by Typora)
-- [MarkText](https://github.com/marktext/marktext) for years of free excellence
-- [CodeMirror 6](https://codemirror.net) — the editor kernel that makes this architecture possible
+“Typora” is a trademark of its owner. Inkstone is an independent project and is
+not affiliated with, endorsed by, or a product of Typora. “Inspired by Typora”
+is descriptive only.
 
 ## License
 
-[MIT](LICENSE) © inkstone contributors
+[MIT](LICENSE) © Inkstone contributors
