@@ -7,7 +7,7 @@ import {
   hasFSA,
 } from "./fileio";
 import { kvGet, kvSet } from "./idb";
-import { toast } from "./ai";
+import { toast } from "./toast";
 import { t } from "./i18n";
 
 /**

@@ -6,6 +6,8 @@
  *   3. Download/upload fallback — Safari, Firefox & friends.
  */
 
+import { isTauri as inTauri } from "@tauri-apps/api/core";
+
 export interface OpenedDoc {
   name: string;
   text: string;
@@ -18,16 +20,6 @@ declare global {
     showOpenFilePicker?: (opts?: object) => Promise<FileSystemFileHandle[]>;
     showSaveFilePicker?: (opts?: object) => Promise<FileSystemFileHandle>;
     showDirectoryPicker?: (opts?: object) => Promise<FileSystemDirectoryHandle>;
-    __TAURI__?: {
-      dialog?: {
-        open: (opts?: object) => Promise<string | string[] | null>;
-        save: (opts?: object) => Promise<string | null>;
-      };
-      fs?: {
-        readTextFile: (path: string) => Promise<string>;
-        writeTextFile: (path: string, contents: string) => Promise<void>;
-      };
-    };
   }
 }
 
@@ -113,7 +105,32 @@ export async function createFileInDir(
   }
 }
 
-export const isTauri = () => typeof window.__TAURI__ !== "undefined";
+export const isTauri = () => inTauri();
+
+/** Read a file the user picked in the desktop shell. */
+export async function readTauriFile(path: string): Promise<string> {
+  const fs = await import("@tauri-apps/plugin-fs");
+  return fs.readTextFile(path);
+}
+
+/**
+ * Save through a temporary file and rename over the target, so an
+ * interrupted write can never leave a truncated document behind. The
+ * File System Access API already has swap-file semantics; this brings the
+ * desktop shell up to the same guarantee.
+ */
+async function writeTauriFileAtomic(path: string, text: string): Promise<void> {
+  const fs = await import("@tauri-apps/plugin-fs");
+  const tmp = `${path}.inkstone-tmp`;
+  try {
+    await fs.writeTextFile(tmp, text);
+    await fs.rename(tmp, path);
+  } catch (e) {
+    console.error("[fileio] atomic save failed, writing in place:", e);
+    await fs.writeTextFile(path, text);
+    await fs.remove(tmp).catch(() => undefined);
+  }
+}
 
 export async function openMarkdown(): Promise<OpenedDoc | null> {
   // 1) File System Access API
@@ -135,14 +152,15 @@ export async function openMarkdown(): Promise<OpenedDoc | null> {
   // 2) Tauri
   if (isTauri()) {
     try {
-      const t = window.__TAURI__!;
-      const path = await t.dialog!.open({
+      const { open } = await import("@tauri-apps/plugin-dialog");
+      const path = await open({
+        multiple: false,
         filters: [{ name: "Markdown", extensions: ["md", "markdown", "txt"] }],
       });
       if (typeof path === "string") {
         return {
           name: path.split(/[\\/]/).pop() || "document.md",
-          text: await t.fs!.readTextFile(path),
+          text: await readTauriFile(path),
           tauriPath: path,
         };
       }
@@ -199,17 +217,17 @@ export async function saveMarkdown(
   // 2) Tauri path (existing or new via save dialog)
   if (isTauri()) {
     try {
-      const t = window.__TAURI__!;
       let path = doc?.tauriPath;
       if (!path) {
-        const picked = await t.dialog!.save({
+        const { save } = await import("@tauri-apps/plugin-dialog");
+        const picked = await save({
           defaultPath: suggested,
           filters: [{ name: "Markdown", extensions: ["md"] }],
         });
         if (!picked) return null;
         path = picked;
       }
-      await t.fs!.writeTextFile(path, text);
+      await writeTauriFileAtomic(path, text);
       return {
         name: path.split(/[\\/]/).pop() || suggested,
         text,

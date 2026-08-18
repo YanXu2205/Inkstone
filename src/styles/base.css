@@ -1,5 +1,11 @@
 /* ===== Inkstone base layout & theming ===== */
 
+/* Component rules set `display`, which otherwise beats the UA's
+   `[hidden] { display: none }` — several controls are toggled that way. */
+[hidden] {
+  display: none !important;
+}
+
 :root {
   --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
     "Microsoft YaHei", system-ui, sans-serif;
@@ -551,4 +557,115 @@ body {
     display: block;
     height: auto;
   }
+}
+
+/* ---- command palette ---- */
+.ot-palette-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(15, 23, 42, 0.35);
+  display: flex;
+  justify-content: center;
+  padding-top: min(18vh, 140px);
+}
+.ot-palette {
+  width: min(560px, 92vw);
+  max-height: min(60vh, 480px);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.ot-palette-input {
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  padding: 14px 16px;
+  font-size: 15px;
+  background: transparent;
+  color: var(--fg);
+  outline: none;
+}
+.ot-palette-list {
+  overflow: auto;
+  padding: 6px;
+}
+.ot-palette-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: var(--fg);
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.ot-palette-item.active,
+.ot-palette-item:hover {
+  background: var(--bg-soft, rgba(99, 102, 241, 0.1));
+}
+.ot-palette-hint {
+  color: var(--fg-faint);
+  font-size: 11.5px;
+  font-family: var(--font-mono);
+}
+.ot-palette-empty {
+  padding: 18px;
+  text-align: center;
+  color: var(--fg-faint);
+  font-size: 13px;
+}
+
+/* ---- focus / source modes ---- */
+html.ot-focus #sidebar,
+html.ot-focus #tabstrip,
+html.ot-focus #statusbar,
+html.ot-focus .tb-right {
+  display: none !important;
+}
+html.ot-focus #topbar {
+  opacity: 0;
+  transition: opacity 0.2s;
+  position: absolute;
+  left: 0; right: 0;
+  z-index: 5;
+}
+html.ot-focus #topbar:hover,
+html.ot-focus #topbar:focus-within {
+  opacity: 1;
+}
+html.ot-focus #main {
+  height: 100vh;
+}
+html.ot-source .ot-math,
+html.ot-source .ot-img,
+html.ot-source .ot-mermaid {
+  /* source mode strips decorations via CM compartment; class is for chrome only */
+}
+
+.tb-btn.on {
+  color: var(--accent);
+}
+
+/* Typora-compatible document root */
+#write {
+  height: 100%;
+}
+#write .cm-editor {
+  height: 100%;
+}
+
+/* CJK: optical spacing between Han and Latin without mutating the file */
+.cm-content {
+  text-spacing-trim: space-all;
+  line-break: strict;
+  word-break: normal;
+  overflow-wrap: anywhere;
 }

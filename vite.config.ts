@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 import { fileURLToPath, URL } from "node:url";
 
 export default defineConfig({
@@ -15,5 +15,11 @@ export default defineConfig({
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
+  },
+  test: {
+    environment: "happy-dom",
+    include: ["src/**/*.test.ts", "tests/**/*.test.ts"],
+    exclude: ["**/node_modules/**", "**/dist/**", "**/.claude/**"],
+    restoreMocks: true,
   },
 });

@@ -1,5 +1,6 @@
-import { toast } from "./ai";
+import { toast } from "./toast";
 import { LANGUAGES, currentLang, t, type Lang } from "./i18n";
+import { K } from "./storage";
 
 /**
  * Editor preferences: content font, size, column width and a custom
@@ -13,7 +14,7 @@ export interface Settings {
   customCss: string;
 }
 
-const KEY = "ot.settings";
+const KEY = K.settings;
 
 const DEFAULTS: Settings = {
   fontFamily: "",
@@ -88,6 +89,7 @@ export function buildSettingsModal(onChange: () => void): HTMLElement {
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")}</textarea>
     <div class="ot-modal-actions">
+      <button class="ot-btn" data-act="ai">✨ ${t("settings.ai")}</button>
       <button class="ot-btn" data-act="reset">${t("settings.reset")}</button>
       <button class="ot-btn primary" data-act="save">${t("settings.save")}</button>
     </div>`;
@@ -106,6 +108,10 @@ export function buildSettingsModal(onChange: () => void): HTMLElement {
   modal.querySelector(".ot-modal-actions")!.addEventListener("click", (e) => {
     const btn = (e.target as HTMLElement).closest("button");
     if (!btn) return;
+    if (btn.dataset.act === "ai") {
+      void import("./ai").then((ai) => ai.openSettings(onChange));
+      return;
+    }
     if (btn.dataset.act === "reset") {
       saveSettings({ ...DEFAULTS });
       applySettings({ ...DEFAULTS });
@@ -123,7 +129,7 @@ export function buildSettingsModal(onChange: () => void): HTMLElement {
       toast(t("settings.saved"));
       const langSel = modal.querySelector<HTMLSelectElement>("select[data-k=lang]")!;
       if (langSel.value !== currentLang) {
-        localStorage.setItem("ot.lang", langSel.value as Lang);
+        localStorage.setItem(K.lang, langSel.value as Lang);
         setTimeout(() => location.reload(), 400);
         return;
       }

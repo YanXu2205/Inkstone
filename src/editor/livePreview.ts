@@ -18,7 +18,7 @@ import {
   TocWidget,
 } from "./widgets";
 import { mathBody } from "./math";
-import { extractHeadings } from "../outline";
+import { extractHeadings } from "./headings";
 
 /**
  * The heart of Inkstone: a Typora-style "seamless live preview".
@@ -68,8 +68,13 @@ function buildDecorations(view: EditorView): DecorationSet {
   const ranges: Range<Decoration>[] = [];
   const doc = state.doc;
 
+  // A view plugin may not replace a line break; anything spanning one has to
+  // be left alone here (blockWidgets handles the block-level cases).
+  const sameLine = (from: number, to: number) =>
+    doc.lineAt(from).number === doc.lineAt(to).number;
+
   const hide = (from: number, to: number) => {
-    if (to > from) ranges.push(HIDDEN.range(from, to));
+    if (to > from && sameLine(from, to)) ranges.push(HIDDEN.range(from, to));
   };
 
   const addLineClass = (pos: number, cls: string, attrs?: Record<string, string>) => {
@@ -188,6 +193,7 @@ function buildDecorations(view: EditorView): DecorationSet {
             const label = doc.sliceString(open.to, close.from);
             // `[^label]` footnote reference → superscript chip widget
             if (label.startsWith("^")) {
+              if (!sameLine(n.from, n.to)) break;
               ranges.push(
                 Decoration.replace({
                   widget: new FootnoteRefWidget(n.from, label.slice(1)),
@@ -206,6 +212,7 @@ function buildDecorations(view: EditorView): DecorationSet {
 
         case "Image": {
           if (touched(sel, n.from, n.to)) break;
+          if (!sameLine(n.from, n.to)) break;
           const urlNode = n.getChild("URL");
           let src = urlNode ? doc.sliceString(urlNode.from, urlNode.to) : "";
           src = src.replace(/^\(/, "").replace(/\)[ \t]*$/, "").trim();
@@ -295,6 +302,8 @@ function buildDecorations(view: EditorView): DecorationSet {
         case "InlineMath":
         case "DisplayMath": {
           if (touched(sel, n.from, n.to)) break;
+          // Multi-line `$$…$$` is rendered by blockWidgets instead.
+          if (!sameLine(n.from, n.to)) break;
           const { tex, display } = mathBody(doc.sliceString(n.from, n.to));
           if (!tex) break;
           ranges.push(
@@ -391,6 +400,25 @@ function safeBuildBlocks(state: EditorState): DecorationSet {
 
     syntaxTree(state).iterate({
       enter: (ref) => {
+        if (ref.name === "DisplayMath") {
+          const n = ref.node;
+          const first = doc.lineAt(n.from);
+          const last = doc.lineAt(n.to);
+          // Single-line math is a plain inline widget (see buildDecorations);
+          // a block replace has to cover whole lines.
+          if (first.number === last.number) return;
+          if (n.from !== first.from || n.to !== last.to) return;
+          if (touched(sel, n.from, n.to)) return;
+          const { tex } = mathBody(doc.sliceString(n.from, n.to));
+          if (!tex) return;
+          ranges.push(
+            Decoration.replace({
+              widget: new MathWidget(n.from, tex, true),
+              block: true,
+            }).range(first.from, last.to),
+          );
+          return;
+        }
         if (ref.name !== "FencedCode") return;
         const n = ref.node;
         const info = n.getChild("CodeInfo");

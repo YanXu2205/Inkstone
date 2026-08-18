@@ -65,18 +65,26 @@ service). If you need that, use Obsidian / Logseq / etc.
 
 ## Optional AI (bring your own key)
 
-Settings → AI. You provide an OpenAI-compatible endpoint and key (presets
-include Ollama / LM Studio on localhost).
+Off by default (Settings → AI). You provide an OpenAI-compatible endpoint and
+key (presets include Ollama / LM Studio on localhost).
 
-Current actions: **polish**, **translate**, **summarize**.
+Actions: polish, concise, expand, continue, translate, summarize, review.
 
-**Honest limits (read before enabling):**
+**How it behaves in this release:**
 
-- The key is stored in **this browser’s `localStorage`** (not an OS keychain).
-- With no selection, the **whole document** may be sent and the reply can
-  **replace the buffer** (undo with Ctrl+Z). Prefer selecting a range first.
-- There is no built-in “diff review” or secret scanner in this release.
-- Nothing is sent until you run an action; the app has no Inkstone cloud.
+- Disabled until you turn it on; the toolbar entry stays hidden while off.
+- Key defaults to **memory only** for the session; optional localStorage is
+  opt-in and warned.
+- Every call shows a **send preview** (exact text + destination + size).
+- Model output is a **reviewable diff** (accept/reject hunks), except
+  **review** which only shows comments.
+- A local **secret scan** runs before send; there is a local audit log.
+- The app has no Inkstone cloud or proxy.
+
+## Download
+
+Desktop installers (Windows / macOS / Linux):  
+https://github.com/YanXu2205/Inkstone/releases
 
 ## Quick start
 

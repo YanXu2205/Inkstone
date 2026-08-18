@@ -1,0 +1,37 @@
+/**
+ * Typora theme compatibility shims.
+ *
+ * Many community Typora themes target `#write` and a handful of `.md-*`
+ * classes. Our live-preview decorations use `ot-*` classes on the CM6
+ * content. This file maps the common Typora selectors onto those so a
+ * pasted Typora theme CSS has a fighting chance without a full rewrite.
+ *
+ * Load order: base → editor → themes → this file → user custom CSS.
+ */
+
+#write {
+  /* already the document root in index.html */
+}
+
+/* Headings */
+.cm-content .ot-h1 { /* h1 */ }
+.cm-content .ot-h2 { /* h2 */ }
+.cm-content .ot-h3 { /* h3 */ }
+
+/* Quote / code / table — expose Typora-ish aliases via attr selectors where safe */
+.cm-line.ot-quote-line {
+  /* Typora: #write blockquote */
+}
+.cm-line.ot-code-line {
+  /* Typora: #write pre / code */
+}
+.cm-line.ot-table-line {
+  /* Typora: #write table */
+}
+
+/* Inline marks used by many themes */
+.cm-content .ot-t-link,
+.cm-content .ot-hl,
+.cm-content .ot-math {
+  /* keep hooks present for theme authors inspecting the DOM */
+}

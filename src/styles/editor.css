@@ -1,3 +1,7 @@
+/* Document root — also the Typora-compatible #write hook. */
+#write { height: 100%; }
+#write > .cm-editor, #editor > .cm-editor { height: 100%; }
+
 /* ===== Editor typography & WYSIWYG look ===== */
 
 #editor .cm-scroller {

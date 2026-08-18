@@ -20,3 +20,6 @@ Thumbs.db
 
 # scratch
 docs/shot-*.png
+
+.claude/
+

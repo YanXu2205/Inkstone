@@ -1,0 +1,177 @@
+/* AI copilot dialogs. Loaded only when the feature is switched on. */
+
+.ot-modal-wide {
+  max-width: 780px;
+  width: min(780px, 92vw);
+}
+
+.ot-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 64vh;
+  overflow: auto;
+}
+
+.ot-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ot-field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg-dim);
+}
+
+.ot-field-hint,
+.ot-note {
+  font-size: 11.5px;
+  color: var(--fg-faint);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.ot-note-warn {
+  color: #b45309;
+}
+
+[data-tone="dark"] .ot-note-warn {
+  color: #fbbf24;
+}
+
+.ot-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.ot-check input {
+  width: auto;
+  margin: 0;
+}
+
+.ot-preset-row,
+.ot-endpoint-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.ot-endpoint-row input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.ot-badge {
+  font-size: 10.5px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--fg-faint);
+  white-space: nowrap;
+}
+
+.ot-badge.local {
+  color: #047857;
+  border-color: #05966955;
+  background: #05966914;
+}
+
+[data-tone="dark"] .ot-badge.local {
+  color: #34d399;
+}
+
+.ot-send-preview,
+.ot-comments,
+.ot-diff {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-soft, rgba(127, 127, 127, 0.06));
+  max-height: 34vh;
+  overflow: auto;
+}
+
+.ot-hunk {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+}
+
+.ot-diff {
+  max-height: none;
+}
+
+.ot-diff-del {
+  display: block;
+  color: #b91c1c;
+  background: #dc262614;
+}
+
+.ot-diff-add {
+  display: block;
+  color: #15803d;
+  background: #16a34a14;
+}
+
+[data-tone="dark"] .ot-diff-del {
+  color: #fca5a5;
+}
+
+[data-tone="dark"] .ot-diff-add {
+  color: #86efac;
+}
+
+.ot-log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 11.5px;
+  color: var(--fg-dim);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 40vh;
+  overflow: auto;
+}
+
+.ot-log li {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: var(--bg-soft, rgba(127, 127, 127, 0.06));
+  word-break: break-all;
+}
+
+.ot-btn.danger {
+  color: #b91c1c;
+}
+
+.ot-hud {
+  position: fixed;
+  right: 18px;
+  bottom: 46px;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.14);
+}

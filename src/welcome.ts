@@ -14,8 +14,8 @@ export const MERMAID_DEMO_MD = `# Mermaid demo
 \`\`\`mermaid
 graph LR
   M[One Markdown buffer] --> L{Live preview}
-  L -->|Typora| P[Paid & closed]
-  L -->|Inkstone| F[Free & open]
+  L -->|caret away| P[Beautiful prose]
+  L -->|caret inside| S[Raw syntax, in place]
 \`\`\`
 
 \`\`\`mermaid
@@ -33,7 +33,7 @@ export const WELCOME_MD = `# Welcome to Inkstone 👋
 [toc]
 
 A **free, open-source, local-first** Markdown editor with a seamless live preview —
-the community successor to Typora & MarkText.
+inspired by Typora, built to stay open.
 
 > Move your caret anywhere and the raw syntax appears **in place**, just like Typora.
 > Move away and it melts back into beautiful prose.
@@ -86,8 +86,8 @@ const view = new EditorView({ doc: markdown, extensions: [livePreview] });
 \`\`\`mermaid
 graph LR
   M[One Markdown buffer] --> L{Live preview}
-  L -->|Typora| P[Paid & closed]
-  L -->|Inkstone| F[Free & open]
+  L -->|caret away| P[Beautiful prose]
+  L -->|caret inside| S[Raw syntax, in place]
 \`\`\`
 
 ## 🖼 Images render inline
@@ -98,14 +98,12 @@ Paste an image from your clipboard — it embeds instantly, fully offline.
 
 ## 📋 Tables
 
-| Feature        | Typora | MarkText | Inkstone |
-| -------------- | :----: | :------: | :--------: |
-| WYSIWYG        |   ✅   |    ✅    |     ✅     |
-| Price          |  paid  |  free*   |   free     |
-| Maintained     |   ✅   |   ❌†    |     ✅     |
-| Local-first    |   ✅   |    ✅    |     ✅     |
-
-\\* last release 2022 &nbsp; · &nbsp; † [unmaintained](https://github.com/marktext/marktext/issues/3597)
+| Promise | What it means |
+| ------------------ | ------------------------------------------------ |
+| Your bytes are yours | Saving only rewrites the blocks you actually edited |
+| Local-first        | No account, no cloud, no telemetry — ever          |
+| Plain files        | A folder of \`.md\`; uninstall and lose nothing      |
+| Opt-in AI          | Off by default; your key, your endpoint, diff-first |
 
 ---
 
@@ -114,7 +112,7 @@ Paste an image from your clipboard — it embeds instantly, fully offline.
 1. Press \`Ctrl+O\` to open a \`.md\` file, or just start typing here
 2. \`Ctrl+S\` saves — in-place on Chrome/Edge & in the desktop app
 3. The **⇩** button exports a self-contained HTML file or prints to PDF
-4. The **✨** button adds AI polish / translate / summarize — your own API key, your own privacy
+4. AI assistance is off until you enable it in **Settings → AI** — bring your own key, or point it at a local model
 
 *This welcome file is just a draft in your browser — nothing is written to disk until you save.*
 `;

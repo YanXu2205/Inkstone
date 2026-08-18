@@ -295,8 +295,22 @@ export function exportLatex(md: MarkdownIt, title: string, src: string): void {
 /* ---------- ePub 3 ---------- */
 
 export async function exportEpub(title: string, src: string): Promise<void> {
+  const zip = buildEpubZip(title, src);
+  const blob = await zip.generateAsync({
+    type: "blob",
+    mimeType: "application/epub+zip",
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${baseName(title)}.epub`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 8000);
+}
+
+/** The ePub 3 package, assembled but not yet serialised or downloaded. */
+export function buildEpubZip(title: string, src: string): JSZip {
   const zip = new JSZip();
-  const name = baseName(title);
   const uuid = `urn:uuid:${crypto.randomUUID()}`;
 
   // mimetype must be the first, uncompressed entry
@@ -384,16 +398,7 @@ img { max-width: 100%; }`,
 </package>`,
   );
 
-  const blob = await zip.generateAsync({
-    type: "blob",
-    mimeType: "application/epub+zip",
-  });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${name}.epub`;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 8000);
+  return zip;
 }
 
 /* ---------- helpers ---------- */

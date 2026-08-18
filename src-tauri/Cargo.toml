@@ -1,9 +1,9 @@
 [package]
 name = "inkstone"
-version = "0.2.0"
+version = "0.3.0"
 description = "Free, open-source WYSIWYG Markdown editor"
 authors = ["inkstone contributors"]
-license = "MIT"
+license = "AGPL-3.0-or-later"
 repository = "https://github.com/YanXu2205/Inkstone"
 edition = "2021"
 

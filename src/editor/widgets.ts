@@ -1,6 +1,6 @@
 import { EditorView, WidgetType } from "@codemirror/view";
 import katex from "katex";
-import { resolveImageSrc } from "../assets";
+import { resolveImage } from "./imageResolver";
 
 /**
  * Inline image — replaces the raw `![alt](src)` syntax with the actual
@@ -34,7 +34,7 @@ export class ImageWidget extends WidgetType {
     // Relative paths inside a folder workspace resolve via the
     // directory handle into a blob URL.
     if (this.src && !/^(data|https?|blob):/i.test(this.src)) {
-      void resolveImageSrc(this.src).then((url) => {
+      void resolveImage(this.src).then((url) => {
         if (url) img.src = url;
       });
     }
@@ -252,6 +252,9 @@ export class MermaidWidget extends WidgetType {
     const mermaid = (await import("mermaid")).default;
     mermaid.initialize({
       startOnLoad: false,
+      // Diagram source is user content, but it may equally have come from a
+      // downloaded document — never let it inject markup or scripts.
+      securityLevel: "strict",
       theme: this.dark ? "dark" : "default",
       fontFamily: getComputedStyle(document.documentElement)
         .getPropertyValue("--font-ui")

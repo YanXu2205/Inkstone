@@ -25,13 +25,19 @@ export class TabManager {
   tabs: Tab[] = [];
   activeId = -1;
 
-  constructor(private view: EditorView) {}
+  /**
+   * @param makeState build a full EditorState for a fresh document. Must pin
+   *   the line separator of `doc` so opening a CRLF file cannot rewrite it.
+   */
+  constructor(
+    private view: EditorView,
+    private makeState: (doc: string) => EditorState,
+  ) {}
 
   get active(): Tab | null {
     return this.tabs.find((t) => t.id === this.activeId) ?? null;
   }
 
-  /** Capture the current editor state into the active tab. */
   syncFromView(): void {
     const cur = this.active;
     if (cur) cur.state = this.view.state;
@@ -45,11 +51,14 @@ export class TabManager {
     isWelcome?: boolean;
     activate?: boolean;
   }): Tab {
-    // dedupe by file identity (or welcome)
-    const key = opts.tauriPath ?? (opts.handle ? handleKey(opts.handle) : opts.isWelcome ? "welcome" : null);
+    const key =
+      opts.tauriPath ??
+      (opts.handle ? handleKey(opts.handle) : opts.isWelcome ? "welcome" : null);
     if (key) {
       const existing = this.tabs.find(
-        (t) => (t.tauriPath ?? (t.handle ? handleKey(t.handle) : t.isWelcome ? "welcome" : null)) === key,
+        (t) =>
+          (t.tauriPath ??
+            (t.handle ? handleKey(t.handle) : t.isWelcome ? "welcome" : null)) === key,
       );
       if (existing) {
         if (opts.activate !== false) this.activate(existing.id);
@@ -84,24 +93,20 @@ export class TabManager {
     if (tab.state) {
       this.view.setState(tab.state);
     } else {
-      // Brand-new tab: swap the live document so editor extensions survive.
-      this.view.dispatch({
-        changes: { from: 0, to: this.view.state.doc.length, insert: tab.initialDoc },
-      });
-      tab.state = this.view.state;
+      const state = this.makeState(tab.initialDoc);
+      this.view.setState(state);
+      tab.state = state;
     }
     this.onChanged();
   }
 
-  /** Replace the active tab's content wholesale (e.g. file reloaded). */
   setActiveContent(text: string): void {
     const cur = this.active;
     if (!cur) return;
-    const tr = this.view.state.update({
-      changes: { from: 0, to: this.view.state.doc.length, insert: text },
-    });
-    this.view.dispatch(tr);
-    cur.state = this.view.state;
+    const state = this.makeState(text);
+    this.view.setState(state);
+    cur.state = state;
+    cur.initialDoc = text;
     cur.dirty = false;
     this.onChanged();
   }
@@ -124,7 +129,7 @@ export class TabManager {
     }
     if (id === this.activeId) {
       const next = this.tabs[Math.min(idx, this.tabs.length - 1)];
-      this.activeId = -1; // force activate
+      this.activeId = -1;
       this.activate(next.id);
     } else {
       this.onChanged();
@@ -137,11 +142,9 @@ export class TabManager {
     this.activate(this.tabs[(idx + 1) % this.tabs.length].id);
   }
 
-  /** Hook for UI refresh; assigned by main.ts. */
   onChanged: () => void = () => {};
 }
 
 export function handleKey(h: FileSystemFileHandle): string {
-  // Handles have no stable string id; name is the best dedupe key we have.
   return `fsa:${h.name}`;
 }

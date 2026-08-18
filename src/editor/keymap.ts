@@ -31,7 +31,6 @@ function wrapWith(before: string, after: string = before): Command {
           to = line.from + word.to;
         }
       }
-      const selected = view.state.sliceDoc(from, to);
       const beforeText = view.state.sliceDoc(from - before.length, from);
       const afterText = view.state.sliceDoc(to, to + after.length);
 
@@ -51,10 +50,7 @@ function wrapWith(before: string, after: string = before): Command {
           { from, insert: before },
           { from: to, insert: after },
         ],
-        range: EditorSelection.range(
-          from + before.length,
-          to + before.length + selected.length,
-        ),
+        range: EditorSelection.range(from + before.length, to + before.length),
       };
     });
     view.dispatch(tr, { scrollIntoView: true });

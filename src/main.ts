@@ -1,15 +1,26 @@
 import "./styles/base.css";
 import "./styles/editor.css";
 import "./styles/themes.css";
+import "./styles/theme-compat.css";
 
 import { EditorView } from "@codemirror/view";
-import { createEditor } from "./editor/editor";
+import { createEditor, createEditorState, setSourceMode } from "./editor/editor";
+import { serializeView } from "./editor/serialize";
+import { openCommandPalette, type Command } from "./commands";
 import { extractHeadings, renderOutline } from "./outline";
-import { openMarkdown, saveMarkdown, readDroppedFile, isTauri } from "./fileio";
+import {
+  isTauri,
+  openMarkdown,
+  readDroppedFile,
+  readTauriFile,
+  saveMarkdown,
+} from "./fileio";
 import { exportHTML, printPDF, mdInstance } from "./export";
 import { exportWord, exportLatex, exportEpub } from "./export-extra";
-import { saveImageToWorkspace, setAssetBase } from "./assets";
-import { buildAIPanel, runAI, toast, type AIPanel } from "./ai";
+import { resolveImageSrc, saveImageToWorkspace, setAssetBase } from "./assets";
+import { setImageResolver } from "./editor/imageResolver";
+import { toast } from "./toast";
+import { isEnabled } from "./ai/config";
 import { WELCOME_MD, MERMAID_DEMO_MD } from "./welcome";
 import { TabManager } from "./tabs";
 import { listRecents, saveRecent, removeRecent, type RecentEntry } from "./idb";
@@ -17,14 +28,17 @@ import { refreshDecos } from "./editor/livePreview";
 import { Workspace } from "./workspace";
 import { applySettings, buildSettingsModal, loadSettings } from "./settings";
 import { initLang, t } from "./i18n";
+import { K, migrateLegacyKeys } from "./storage";
 
+migrateLegacyKeys();
+setImageResolver(resolveImageSrc);
 initLang();
 
 /* ---------------- state ---------------- */
 
-const DRAFT_KEY = "ot.draft.v2";
-const THEME_KEY = "ot.theme";
-const TYPEWRITER_KEY = "ot.typewriter";
+const DRAFT_KEY = K.draft;
+const THEME_KEY = K.theme;
+const TYPEWRITER_KEY = K.typewriter;
 
 const THEMES: { id: string; tone: "light" | "dark" }[] = [
   { id: "auto", tone: matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light" },
@@ -38,6 +52,9 @@ const THEMES: { id: string; tone: "light" | "dark" }[] = [
 let view: EditorView;
 let tabman: TabManager;
 let typewriter = localStorage.getItem(TYPEWRITER_KEY) === "1";
+let sourceMode = false;
+let focusMode = false;
+let editorCb: Parameters<typeof createEditor>[2];
 
 /* ---------------- dom ---------------- */
 
@@ -130,7 +147,7 @@ $("#btn-theme").addEventListener("click", (e) => {
 $("#btn-export").addEventListener("click", (e) => {
   e.stopPropagation();
   const title = docTitle();
-  const src = () => view.state.doc.toString();
+  const src = () => serializeView(view);
   showMenu(e.currentTarget as HTMLElement, [
     [t("menu.exportHtml"), () => exportHTML(title, src())],
     [t("menu.exportWord"), () => exportWord(title, src())],
@@ -145,24 +162,24 @@ $("#btn-export").addEventListener("click", (e) => {
 $("#btn-sidebar").addEventListener("click", () => sidebar.classList.toggle("collapsed"));
 const toggleSidebar = () => sidebar.classList.toggle("collapsed");
 
-/* ---------------- AI panel ---------------- */
+/* ---------------- AI copilot (off by default, loaded on demand) ---------------- */
 
-let aiPanel: AIPanel | null = null;
+const btnAI = $<HTMLButtonElement>("#btn-ai");
 
-$("#btn-ai").addEventListener("click", () => {
-  if (aiPanel) {
-    aiPanel.close();
-    aiPanel = null;
-    return;
-  }
-  aiPanel = buildAIPanel((id) => runAI(view, id));
-  aiPanel.el.addEventListener("click", (e) => {
-    if (e.target === aiPanel?.el) {
-      aiPanel.close();
-      aiPanel = null;
-    }
+function refreshAIButton() {
+  btnAI.hidden = !isEnabled();
+}
+
+btnAI.addEventListener("click", (e) => {
+  e.stopPropagation();
+  void import("./ai").then((ai) => {
+    const items: [string, () => void][] = ai.ACTIONS.map((a) => [
+      t(`ai.act.${a.id}`),
+      () => void ai.runAction(view, a.id),
+    ]);
+    items.push([`⚙ ${t("ai.title")}`, () => ai.openSettings(refreshAIButton)]);
+    showMenu(btnAI, items);
   });
-  document.body.appendChild(aiPanel.el);
 });
 
 /* ---------------- folder workspace ---------------- */
@@ -226,7 +243,12 @@ async function pasteImage(file: File) {
 /* ---------------- settings ---------------- */
 
 $("#btn-settings").addEventListener("click", () => {
-  document.body.appendChild(buildSettingsModal(() => view.focus()));
+  document.body.appendChild(
+    buildSettingsModal(() => {
+      refreshAIButton();
+      view.focus();
+    }),
+  );
 });
 
 /* ---------------- typewriter mode ---------------- */
@@ -236,12 +258,19 @@ function setTypewriter(on: boolean) {
   localStorage.setItem(TYPEWRITER_KEY, on ? "1" : "0");
   $("#btn-typewriter").classList.toggle("on", on);
   $("#btn-typewriter").style.color = on ? "var(--accent)" : "";
-  stMode.textContent = t(on ? "status.modeTypewriter" : "status.mode");
+  refreshModeStatus();
 }
 
 $("#btn-typewriter").addEventListener("click", () => {
   setTypewriter(!typewriter);
   toast(t("toast.typewriter", t(typewriter ? "common.on" : "common.off")));
+});
+
+$("#btn-source")?.addEventListener("click", () => setSource(!sourceMode));
+$("#btn-focus")?.addEventListener("click", () => setFocus(!focusMode));
+$("#btn-palette")?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  openPalette();
 });
 
 /* ---------------- status / outline ---------------- */
@@ -258,7 +287,7 @@ function refreshStatus() {
 }
 
 function refreshCounts() {
-  const doc = view.state.doc.toString();
+  const doc = serializeView(view);
   const cjk = (doc.match(/[\u3400-\u4dbf\u4e00-\u9fff]/g) || []).length;
   const words = (doc.match(/[A-Za-z0-9][A-Za-z0-9'’\-_]*/g) || []).length;
   stCount.textContent = t("status.words", cjk + words, doc.length);
@@ -266,7 +295,7 @@ function refreshCounts() {
 
 function refreshOutline() {
   renderOutline(
-    extractHeadings(view.state.doc.toString()),
+    extractHeadings(serializeView(view)),
     outlineEl,
     view,
     view.state.selection.main.head,
@@ -361,8 +390,7 @@ async function openRecent(entry: RecentEntry) {
       refreshAll();
       toast(t("toast.opened", file.name));
     } else if (entry.tauriPath && isTauri()) {
-      const t = window.__TAURI__!;
-      const text = await t.fs!.readTextFile(entry.tauriPath);
+      const text = await readTauriFile(entry.tauriPath);
       tabman.openTab({ name: entry.name, doc: text, tauriPath: entry.tauriPath });
       refreshAll();
     }
@@ -382,7 +410,7 @@ function scheduleDraft() {
   draftTimer = setTimeout(() => {
     const cur = tabman.active;
     if (!cur?.isWelcome) return;
-    const text = view.state.doc.toString();
+    const text = serializeView(view);
     // An unedited welcome should never shadow future welcome updates.
     if (text === WELCOME_MD) localStorage.removeItem(DRAFT_KEY);
     else localStorage.setItem(DRAFT_KEY, text);
@@ -422,7 +450,7 @@ async function openDropped(file: File) {
 
 async function saveFile() {
   const cur = tabman.active;
-  const saved = await saveMarkdown(view.state.doc.toString(), cur);
+  const saved = await saveMarkdown(serializeView(view), cur);
   if (saved) {
     Object.assign(cur ?? {}, saved);
     tabman.markDirty(false);
@@ -443,6 +471,112 @@ window.addEventListener("beforeunload", (e) => {
   }
 });
 
+
+/* ---------------- source / focus / palette ---------------- */
+
+function refreshModeStatus() {
+  if (sourceMode) stMode.textContent = t("status.modeSource");
+  else if (focusMode) stMode.textContent = t("status.modeFocus");
+  else if (typewriter) stMode.textContent = t("status.modeTypewriter");
+  else stMode.textContent = t("status.mode");
+  $("#btn-source")?.classList.toggle("on", sourceMode);
+  $("#btn-focus")?.classList.toggle("on", focusMode);
+  document.documentElement.classList.toggle("ot-source", sourceMode);
+  document.documentElement.classList.toggle("ot-focus", focusMode);
+}
+
+function setSource(on: boolean) {
+  sourceMode = on;
+  setSourceMode(view, on);
+  refreshModeStatus();
+  toast(t(on ? "toast.sourceOn" : "toast.sourceOff"));
+  view.focus();
+}
+
+function setFocus(on: boolean) {
+  focusMode = on;
+  refreshModeStatus();
+  toast(t(on ? "toast.focusOn" : "toast.focusOff"));
+  view.focus();
+}
+
+function openPalette() {
+  const cmds: Command[] = [
+    { id: "open", label: t("cmd.open"), hint: "Ctrl+O", run: () => void openFile() },
+    { id: "save", label: t("cmd.save"), hint: "Ctrl+S", run: () => void saveFile() },
+    {
+      id: "new",
+      label: t("cmd.newTab"),
+      run: () => tabman.openTab({ name: "Welcome.md", doc: WELCOME_MD, isWelcome: true }),
+    },
+    { id: "sidebar", label: t("cmd.toggleSidebar"), hint: "Ctrl+\\", run: toggleSidebar },
+    {
+      id: "source",
+      label: t("cmd.toggleSource"),
+      hint: "Ctrl+/",
+      run: () => setSource(!sourceMode),
+    },
+    {
+      id: "focus",
+      label: t("cmd.toggleFocus"),
+      run: () => setFocus(!focusMode),
+    },
+    {
+      id: "typewriter",
+      label: t("cmd.toggleTypewriter"),
+      run: () => setTypewriter(!typewriter),
+    },
+    {
+      id: "export-html",
+      label: t("cmd.exportHtml"),
+      run: () => exportHTML(docTitle(), serializeView(view)),
+    },
+    {
+      id: "export-pdf",
+      label: t("cmd.exportPdf"),
+      run: () => printPDF(docTitle(), serializeView(view)),
+    },
+    {
+      id: "settings",
+      label: t("cmd.settings"),
+      run: () =>
+        document.body.appendChild(
+          buildSettingsModal(() => {
+            refreshAIButton();
+            view.focus();
+          }),
+        ),
+    },
+    {
+      id: "ai",
+      label: t("cmd.ai"),
+      run: () => void import("./ai").then((ai) => ai.openSettings(refreshAIButton)),
+    },
+    ...THEMES.map((th) => ({
+      id: `theme-${th.id}`,
+      label: t("cmd.theme", t(`theme.${th.id}`)),
+      run: () => {
+        themeId = th.id;
+        localStorage.setItem(THEME_KEY, th.id);
+        applyTheme();
+      },
+    })),
+    ...extractHeadings(serializeView(view)).map((h, i) => ({
+      id: `h-${i}`,
+      label: `${"#".repeat(h.level)} ${h.text}`,
+      hint: t("sidebar.outline"),
+      run: () => {
+        view.dispatch({
+          selection: { anchor: h.pos },
+          effects: EditorView.scrollIntoView(h.pos, { y: "center" }),
+        });
+        view.focus();
+      },
+    })),
+  ];
+  openCommandPalette(cmds);
+}
+
 /* ---------------- boot ---------------- */
 
 const demo = new URLSearchParams(location.search).get("demo");
@@ -452,10 +586,12 @@ const initialDoc =
     : (localStorage.getItem(DRAFT_KEY) ?? WELCOME_MD);
 const isFreshWelcome = initialDoc === WELCOME_MD;
 
-view = createEditor($("#editor"), initialDoc, {
+editorCb = {
   onSave: saveFile,
   onOpen: openFile,
   onToggleSidebar: toggleSidebar,
+  onCommandPalette: () => openPalette(),
+  onToggleSource: () => setSource(!sourceMode),
   onDocChanged: () => {
     tabman.markDirty(true);
     tabman.syncFromView();
@@ -475,18 +611,26 @@ view = createEditor($("#editor"), initialDoc, {
   },
   onOpenDroppedFile: openDropped,
   onPasteImage: (file) => void pasteImage(file),
-});
+};
 
-tabman = new TabManager(view);
+view = createEditor($("#editor"), initialDoc, editorCb);
+
+tabman = new TabManager(view, (doc) => createEditorState(doc, editorCb));
 tabman.openTab({ name: "Welcome.md", doc: initialDoc, isWelcome: isFreshWelcome });
-tabman.onChanged = renderTabs;
+tabman.onChanged = () => {
+  renderTabs();
+  // Source mode is a view-level compartment; re-apply after every state swap.
+  if (sourceMode) setSourceMode(view, true);
+};
 tabman.markDirty(false);
 renderTabs();
 wireWorkspace();
 
 applySettings(loadSettings());
 applyTheme();
+refreshAIButton();
 setTypewriter(typewriter);
+refreshModeStatus();
 refreshAll();
 renderRecents(await listRecents());
 view.focus();

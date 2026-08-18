@@ -7,7 +7,7 @@ import {
   keymap,
   rectangularSelection,
 } from "@codemirror/view";
-import { EditorState, type Extension } from "@codemirror/state";
+import { Compartment, EditorState, type Extension } from "@codemirror/state";
 import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import { search, searchKeymap } from "@codemirror/search";
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
@@ -27,45 +27,25 @@ import {
   toggleItalic,
   toggleStrike,
 } from "./keymap";
+import { lineSeparatorExt, serializeDoc } from "./serialize";
 
 export interface EditorCallbacks {
-  /** Ctrl+S */
   onSave(): void;
-  /** Ctrl+O */
   onOpen(): void;
-  /** Ctrl+\ — toggle outline sidebar */
   onToggleSidebar(): void;
-  /** Called after every document change. */
+  onCommandPalette?(): void;
+  onToggleSource?(): void;
   onDocChanged?(doc: string): void;
-  /** Called after caret/selection moves. */
   onSelectionChanged?(view: EditorView): void;
-  /** User dropped a .md file onto the editor. */
   onOpenDroppedFile?(file: File): void;
-  /** Pasted or dropped an image; the app decides data-URL vs workspace file. */
   onPasteImage?(file: File): void;
 }
 
-export function createEditor(
-  parent: HTMLElement,
-  initialDoc: string,
-  cb: EditorCallbacks,
-): EditorView {
-  const view = new EditorView({
-    parent,
-    state: EditorState.create({
-      doc: initialDoc,
-      extensions: [
-        baseExtensions(),
-        interactiveHandlers(cb),
-        keymapLayer(cb),
-        updateListener(cb),
-      ],
-    }),
-  });
-  return view;
-}
+/** Compartment holding the live-preview decorations — emptied in source mode. */
+export const previewCompartment = new Compartment();
 
-function baseExtensions(): Extension[] {
+/** Everything that is independent of a particular document's line endings. */
+export function baseExtensions(): Extension[] {
   return [
     history(),
     drawSelection(),
@@ -76,8 +56,6 @@ function baseExtensions(): Extension[] {
     EditorView.lineWrapping,
     indentUnit.of("  "),
     search(),
-    // markdownLanguage = CommonMark + GFM (tables, task lists, strikethrough…)
-    // plus our $…$ / $$…$$ math extension.
     markdown({
       base: {
         parser: (markdownLanguage.parser as MarkdownParser).configure({
@@ -92,13 +70,56 @@ function baseExtensions(): Extension[] {
       codeLanguages: languages,
     }),
     syntaxHighlighting(otHighlight),
-    livePreview,
-    blockWidgets,
-    blockWatcher,
+    previewCompartment.of(previewExtensions()),
   ];
 }
 
-/** Paste images & drop files. */
+export function previewExtensions(): Extension[] {
+  return [livePreview, blockWidgets, blockWatcher];
+}
+
+export function createEditor(
+  parent: HTMLElement,
+  initialDoc: string,
+  cb: EditorCallbacks,
+): EditorView {
+  return new EditorView({
+    parent,
+    state: createEditorState(initialDoc, cb),
+  });
+}
+
+/**
+ * Open a new document in an existing view, pinning the line ending the file
+ * arrived with so a later save cannot rewrite every line.
+ */
+export function createEditorState(doc: string, cb: EditorCallbacks): EditorState {
+  return EditorState.create({
+    doc,
+    extensions: editorExtensions(doc, cb),
+  });
+}
+
+export function openInEditor(view: EditorView, text: string, cb: EditorCallbacks): void {
+  view.setState(createEditorState(text, cb));
+}
+
+export function setSourceMode(view: EditorView, source: boolean): void {
+  view.dispatch({
+    effects: previewCompartment.reconfigure(source ? [] : previewExtensions()),
+  });
+}
+
+function editorExtensions(doc: string, cb: EditorCallbacks): Extension[] {
+  return [
+    lineSeparatorExt(doc),
+    baseExtensions(),
+    interactiveHandlers(cb),
+    keymapLayer(cb),
+    updateListener(cb),
+  ];
+}
+
 function interactiveHandlers(cb: EditorCallbacks): Extension {
   return EditorView.domEventHandlers({
     paste(event) {
@@ -137,6 +158,16 @@ function keymapLayer(cb: EditorCallbacks): Extension {
     { key: "Mod-s", preventDefault: true, run: () => (cb.onSave(), true) },
     { key: "Mod-o", preventDefault: true, run: () => (cb.onOpen(), true) },
     { key: "Mod-\\", preventDefault: true, run: () => (cb.onToggleSidebar(), true) },
+    {
+      key: "Mod-Shift-p",
+      preventDefault: true,
+      run: () => (cb.onCommandPalette?.(), true),
+    },
+    {
+      key: "Mod-/",
+      preventDefault: true,
+      run: () => (cb.onToggleSource?.(), true),
+    },
     { key: "Mod-b", preventDefault: true, run: toggleBold },
     { key: "Mod-i", preventDefault: true, run: toggleItalic },
     { key: "Mod-e", preventDefault: true, run: toggleInlineCode },
@@ -145,7 +176,10 @@ function keymapLayer(cb: EditorCallbacks): Extension {
     {
       key: "Mod-End",
       preventDefault: true,
-      run: (v) => (v.dispatch({ selection: { anchor: v.state.doc.length }, scrollIntoView: true }), true),
+      run: (v) => (
+        v.dispatch({ selection: { anchor: v.state.doc.length }, scrollIntoView: true }),
+        true
+      ),
     },
     {
       key: "Mod-Home",
@@ -161,7 +195,7 @@ function keymapLayer(cb: EditorCallbacks): Extension {
 
 function updateListener(cb: EditorCallbacks): Extension {
   return EditorView.updateListener.of((update) => {
-    if (update.docChanged) cb.onDocChanged?.(update.state.doc.toString());
+    if (update.docChanged) cb.onDocChanged?.(serializeDoc(update.state));
     if (update.selectionSet) cb.onSelectionChanged?.(update.view);
   });
 }
