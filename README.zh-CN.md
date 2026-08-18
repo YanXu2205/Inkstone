@@ -40,7 +40,8 @@ Inkstone 是面向 **`.md` 单文件写作** 的编辑器：
 - `==高亮==`、脚注、`[toc]`
 - 多标签；最近文件；文件夹工作区（File System Access API）
 - 粘贴图片：有工作区时写入 `assets/`，否则 data URL
-- 五套主题 + 跟随系统；打字机模式；大纲
+- 五套界面主题 + 跟随系统；**文档主题**（内置 GitHub/Paper/Ink Dark，可导入 Typora 风格 `.css`）
+- 打字机模式；大纲；命令面板
 - 字体 / 字号 / 栏宽 / 自定义 CSS
 - 导出：HTML、Word（`.doc`）、LaTeX、ePub 3、打印/PDF
 - 界面：English / 简体中文 / 日本語
@@ -93,6 +94,14 @@ npm run check
 npm test             # LaTeX / ePub 导出冒烟测试
 npm run build
 ```
+
+## 发布签名
+
+可选。见 [docs/SIGNING.md](docs/SIGNING.md)。
+
+## 介绍长文
+
+[docs/LAUNCH.zh-CN.md](docs/LAUNCH.zh-CN.md)
 
 ## 技术栈
 

@@ -1,0 +1,53 @@
+/* GitHub-flavored document theme for #write (Inkstone / Typora-compat). */
+#write .cm-content {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans",
+    Helvetica, Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  color: #1f2328;
+}
+[data-tone="dark"] #write .cm-content {
+  color: #e6edf3;
+}
+#write .ot-h1 {
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid #d1d9e0;
+  margin-top: 1.2em;
+}
+[data-tone="dark"] #write .ot-h1 {
+  border-bottom-color: #3d444d;
+}
+#write .ot-h2 {
+  padding-bottom: 0.25em;
+  border-bottom: 1px solid #d8dee4;
+  margin-top: 1.1em;
+}
+[data-tone="dark"] #write .ot-h2 {
+  border-bottom-color: #3d444d;
+}
+#write .ot-t-link {
+  color: #0969da;
+}
+[data-tone="dark"] #write .ot-t-link {
+  color: #4493f8;
+}
+#write .ot-code-line {
+  background: #f6f8fa;
+}
+[data-tone="dark"] #write .ot-code-line {
+  background: #151b23;
+}
+#write .ot-quote-line {
+  border-left-color: #d1d9e0;
+  color: #656d76;
+}
+[data-tone="dark"] #write .ot-quote-line {
+  border-left-color: #3d444d;
+  color: #9198a1;
+}
+#write .ot-hl {
+  background: #fff8c5;
+}
+[data-tone="dark"] #write .ot-hl {
+  background: #3a2e00;
+}

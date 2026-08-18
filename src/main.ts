@@ -29,6 +29,7 @@ import { Workspace } from "./workspace";
 import { applySettings, buildSettingsModal, loadSettings } from "./settings";
 import { initLang, t } from "./i18n";
 import { K, migrateLegacyKeys } from "./storage";
+import { restoreDocTheme } from "./themes";
 
 migrateLegacyKeys();
 setImageResolver(resolveImageSrc);
@@ -627,6 +628,7 @@ renderTabs();
 wireWorkspace();
 
 applySettings(loadSettings());
+void restoreDocTheme();
 applyTheme();
 refreshAIButton();
 setTypewriter(typewriter);

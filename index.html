@@ -8,12 +8,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Inkstone — a free, open-source, local-first WYSIWYG Markdown editor. The community successor to Typora & MarkText."
+      content="Inkstone — free, open-source, local-first WYSIWYG Markdown editor. Inspired by Typora."
     />
     <title>Inkstone</title>
     <script>
       // Apply saved theme before first paint to avoid flashing.
-      const t = localStorage.getItem("ot.theme") || "auto";
+      const t = localStorage.getItem("ink.theme")||localStorage.getItem("ot.theme") || "auto";
       const darkTones = { dark: 1, nord: 1, dracula: 1 };
       const dark =
         t === "auto"
@@ -69,7 +69,7 @@
           <div class="sb-title" data-i18n="sidebar.outline" style="margin-top: 14px">Outline</div>
           <nav id="outline"></nav>
         </aside>
-        <div id="editor-wrap">
+        <div id="write">
           <div id="editor"></div>
         </div>
       </div>

@@ -1,6 +1,14 @@
 import { toast } from "./toast";
 import { LANGUAGES, currentLang, t, type Lang } from "./i18n";
 import { K } from "./storage";
+import {
+  BUNDLED_DOC_THEMES,
+  applyDocTheme,
+  getActiveDocThemeId,
+  getImportedCss,
+  importDocThemeCss,
+  importedThemeLabel,
+} from "./themes";
 
 /**
  * Editor preferences: content font, size, column width and a custom
@@ -65,6 +73,17 @@ export function buildSettingsModal(onChange: () => void): HTMLElement {
     .map(([v, l]) => `<option value="${v}">${l}</option>`)
     .join("");
 
+  const activeDoc = getActiveDocThemeId();
+  const docThemeOptions = [
+    ...BUNDLED_DOC_THEMES.map((th) => {
+      const sel = th.id === activeDoc ? " selected" : "";
+      return `<option value="${th.id}"${sel}>${th.label}</option>`;
+    }),
+    ...(getImportedCss()
+      ? [`<option value="imported"${activeDoc === "imported" ? " selected" : ""}>${importedThemeLabel()}</option>`]
+      : []),
+  ].join("");
+
   const langOptions = LANGUAGES.map(
     (l) => `<option value="${l.id}"${l.id === currentLang ? " selected" : ""}>${l.label}</option>`,
   ).join("");
@@ -83,6 +102,14 @@ export function buildSettingsModal(onChange: () => void): HTMLElement {
     <input data-k="fontSize" type="range" min="13" max="21" step="0.5" value="${s.fontSize}">
     <label>${t("settings.colWidth")} — <span data-v="columnWidth"></span> px</label>
     <input data-k="columnWidth" type="range" min="600" max="1100" step="10" value="${s.columnWidth}">
+    <label>${t("settings.docTheme")}</label>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <select data-k="docTheme" style="flex:1;min-width:160px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg-side);color:var(--fg)">
+        ${docThemeOptions}
+      </select>
+      <button type="button" class="ot-btn" data-act="import-theme">${t("settings.importTheme")}</button>
+    </div>
+    <p style="margin:4px 0 10px;font-size:11.5px;color:var(--fg-faint)">${t("settings.docThemeHint")}</p>
     <label>${t("settings.customCss")} <span style="opacity:.6">${t("settings.customCssHint")}</span></label>
     <textarea data-k="customCss" rows="5" spellcheck="false"
       style="width:100%;font-family:var(--font-mono);font-size:12px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg-side);color:var(--fg);resize:vertical">${s.customCss
@@ -112,6 +139,31 @@ export function buildSettingsModal(onChange: () => void): HTMLElement {
       void import("./ai").then((ai) => ai.openSettings(onChange));
       return;
     }
+    if (btn.dataset.act === "import-theme") {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".css,text/css";
+      input.onchange = async () => {
+        const file = input.files?.[0];
+        if (!file) return;
+        const css = await file.text();
+        importDocThemeCss(css, file.name);
+        toast(t("settings.themeImported", file.name));
+        const sel = modal.querySelector<HTMLSelectElement>("select[data-k=docTheme]");
+        if (sel) {
+          let opt = sel.querySelector('option[value="imported"]') as HTMLOptionElement | null;
+          if (!opt) {
+            opt = document.createElement("option");
+            opt.value = "imported";
+            sel.appendChild(opt);
+          }
+          opt.textContent = file.name;
+          sel.value = "imported";
+        }
+      };
+      input.click();
+      return;
+    }
     if (btn.dataset.act === "reset") {
       saveSettings({ ...DEFAULTS });
       applySettings({ ...DEFAULTS });
@@ -126,7 +178,8 @@ export function buildSettingsModal(onChange: () => void): HTMLElement {
       };
       saveSettings(next);
       applySettings(next);
-      toast(t("settings.saved"));
+      const docSel = modal.querySelector<HTMLSelectElement>("select[data-k=docTheme]")!;
+      void applyDocTheme(docSel.value).then(() => toast(t("settings.saved")));
       const langSel = modal.querySelector<HTMLSelectElement>("select[data-k=lang]")!;
       if (langSel.value !== currentLang) {
         localStorage.setItem(K.lang, langSel.value as Lang);

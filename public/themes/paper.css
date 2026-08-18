@@ -1,0 +1,38 @@
+/* Print-friendly paper theme. */
+#write .cm-content {
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC",
+    "Source Han Serif SC", Georgia, serif;
+  font-size: 17px;
+  line-height: 1.85;
+  color: #1a1a1a;
+}
+[data-tone="dark"] #write .cm-content {
+  color: #e8e4dc;
+}
+#write .ot-h1,
+#write .ot-h2,
+#write .ot-h3 {
+  font-family: "Iowan Old Style", Palatino, "Songti SC", Georgia, serif;
+  letter-spacing: 0.01em;
+}
+#write .ot-h1 {
+  font-size: 2em;
+  text-align: center;
+  margin: 1.4em 0 0.8em;
+  border: 0;
+}
+#write .ot-quote-line {
+  border-left-color: #c4a574;
+  font-style: italic;
+}
+#write .ot-code-line {
+  font-size: 0.9em;
+  background: rgba(90, 70, 40, 0.06);
+}
+#write .ot-t-link {
+  color: #8b4513;
+  text-decoration-style: dotted;
+}
+[data-tone="dark"] #write .ot-t-link {
+  color: #e0b080;
+}

@@ -376,7 +376,7 @@ body {
   padding: 6px 10px;
 }
 
-#editor-wrap {
+#write {
   flex: 1;
   min-width: 0;
   position: relative;

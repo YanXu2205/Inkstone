@@ -57,7 +57,8 @@ service). If you need that, use Obsidian / Logseq / etc.
 - `==highlight==`, footnotes, `[toc]`
 - Multi-tab editing; recent files; folder workspace (File System Access API)
 - Paste image → `assets/` when a folder is open, otherwise data URL
-- Five themes + system; typewriter mode; outline sidebar
+- Five UI themes + system; **document themes** (bundled GitHub/Paper/Ink Dark, or import Typora-style `.css`)
+- Typewriter mode; outline sidebar; command palette
 - Editor prefs: font, size, column width, custom CSS
 - Export: HTML, Word (`.doc`), LaTeX, ePub 3, print/PDF
 - UI languages: English, 简体中文, 日本語
@@ -124,6 +125,14 @@ npm run build
 | Export | markdown-it, JSZip (ePub) |
 | Desktop | Tauri 2 (dialogs + fs) |
 | License | MIT |
+
+## Signing releases
+
+Optional. See [docs/SIGNING.md](docs/SIGNING.md).
+
+## 中文介绍
+
+[docs/LAUNCH.zh-CN.md](docs/LAUNCH.zh-CN.md)
 
 ## Contributing
 
