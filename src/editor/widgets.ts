@@ -133,7 +133,12 @@ export class TocWidget extends WidgetType {
     wrap.className = "ot-toc";
     const title = document.createElement("div");
     title.className = "ot-toc-title";
-    title.textContent = "Table of Contents";
+    const lang = document.documentElement.lang || "";
+    title.textContent = lang.startsWith("zh")
+      ? "目录"
+      : lang.startsWith("ja")
+        ? "目次"
+        : "Table of Contents";
     wrap.appendChild(title);
     for (const h of this.headings) {
       const item = document.createElement("div");
@@ -154,7 +159,11 @@ export class TocWidget extends WidgetType {
       const empty = document.createElement("div");
       empty.className = "ot-toc-item";
       empty.style.opacity = "0.6";
-      empty.textContent = "(no headings yet)";
+      empty.textContent = lang.startsWith("zh")
+        ? "（还没有标题）"
+        : lang.startsWith("ja")
+          ? "（見出しがありません）"
+          : "(no headings yet)";
       wrap.appendChild(empty);
     }
     return wrap;

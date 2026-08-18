@@ -21,7 +21,7 @@ import { resolveImageSrc, saveImageToWorkspace, setAssetBase } from "./assets";
 import { setImageResolver } from "./editor/imageResolver";
 import { toast } from "./toast";
 import { isEnabled } from "./ai/config";
-import { WELCOME_MD, MERMAID_DEMO_MD } from "./welcome";
+import { WELCOME_MD, MERMAID_DEMO_MD, SAMPLE_WECHAT_MD } from "./welcome";
 import { TabManager } from "./tabs";
 import { listRecents, saveRecent, removeRecent, type RecentEntry } from "./idb";
 import { refreshDecos } from "./editor/livePreview";
@@ -343,7 +343,7 @@ function renderTabs() {
   plus.className = "ot-tab-new";
   plus.textContent = "+";
   plus.title = t("tabs.newTab");
-  plus.onclick = () => tabman.openTab({ name: "Welcome.md", doc: WELCOME_MD, isWelcome: true });
+  plus.onclick = () => tabman.openTab({ name: "未命名.md", doc: "", isWelcome: false });
   tabstrip.appendChild(plus);
   refreshHeader();
 }
@@ -508,7 +508,13 @@ function openPalette() {
     {
       id: "new",
       label: t("cmd.newTab"),
-      run: () => tabman.openTab({ name: "Welcome.md", doc: WELCOME_MD, isWelcome: true }),
+      run: () => tabman.openTab({ name: "未命名.md", doc: "", isWelcome: false }),
+    },
+    {
+      id: "sample-wechat",
+      label: t("cmd.sampleWechat"),
+      run: () =>
+        tabman.openTab({ name: "公众号示例.md", doc: SAMPLE_WECHAT_MD, isWelcome: false }),
     },
     { id: "sidebar", label: t("cmd.toggleSidebar"), hint: "Ctrl+\\", run: toggleSidebar },
     {
@@ -584,8 +590,12 @@ const demo = new URLSearchParams(location.search).get("demo");
 const initialDoc =
   demo === "mermaid"
     ? MERMAID_DEMO_MD
-    : (localStorage.getItem(DRAFT_KEY) ?? WELCOME_MD);
+    : demo === "wechat"
+      ? SAMPLE_WECHAT_MD
+      : (localStorage.getItem(DRAFT_KEY) ?? WELCOME_MD);
 const isFreshWelcome = initialDoc === WELCOME_MD;
+const initialName =
+  demo === "wechat" ? "公众号示例.md" : demo === "mermaid" ? "Mermaid.md" : "欢迎.md";
 
 editorCb = {
   onSave: saveFile,
@@ -617,7 +627,11 @@ editorCb = {
 view = createEditor($("#editor"), initialDoc, editorCb);
 
 tabman = new TabManager(view, (doc) => createEditorState(doc, editorCb));
-tabman.openTab({ name: "Welcome.md", doc: initialDoc, isWelcome: isFreshWelcome });
+tabman.openTab({
+  name: initialName,
+  doc: initialDoc,
+  isWelcome: isFreshWelcome && demo !== "wechat",
+});
 tabman.onChanged = () => {
   renderTabs();
   // Source mode is a view-level compartment; re-apply after every state swap.
