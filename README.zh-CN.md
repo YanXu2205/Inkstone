@@ -17,6 +17,15 @@
 
 ![OpenTypora 浅色主题](docs/screenshot-light.png)
 
+<details>
+<summary><b>更多截图</b>（深色主题 · Mermaid · 简体中文界面）</summary>
+
+![深色主题](docs/screenshot-dark.png)
+![Mermaid 图表](docs/screenshot-mermaid.png)
+![简体中文界面](docs/screenshot-zh.png)
+
+</details>
+
 光标移到哪里，哪里的原始 Markdown 语法就**原地显现**；移开，它又化回漂亮的正文。没有分栏、没有预览窗口、没有开关——只有你和文字。
 
 ## 为什么做这个项目

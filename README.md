@@ -8,7 +8,7 @@
 The community successor to [Typora](https://typora.io) & [MarkText](https://github.com/marktext/marktext).
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-6366f1.svg)](LICENSE)
-[![CI](https://img.shields.io/badge/CI-building-8b5cf6?logo=githubactions)](.github/workflows/ci.yml)
+[![CI](https://github.com/open-typora/open-typora/actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 *English · [简体中文](README.zh-CN.md)*
@@ -22,6 +22,16 @@ The community successor to [Typora](https://typora.io) & [MarkText](https://gith
 Move your caret anywhere and the raw Markdown appears **in place** — move away and it melts back into beautiful prose. No split pane, no preview window, no toggle. Just you and the text.
 
 ![Caret reveals the raw syntax, just like Typora](docs/screenshot-caret.png)
+
+<details>
+<summary><b>More screenshots</b> (dark theme · Dracula · Mermaid · 简体中文)</summary>
+
+![Dark theme](docs/screenshot-dark.png)
+![Dracula theme](docs/screenshot-dracula.png)
+![Mermaid diagrams](docs/screenshot-mermaid.png)
+![简体中文界面](docs/screenshot-zh.png)
+
+</details>
 
 ## Why
 
